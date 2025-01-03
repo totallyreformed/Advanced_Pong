@@ -1,4 +1,4 @@
-#include "Level.h"
+﻿#include "Level.h"
 #include "GameState.h"
 #include "sgg/graphics.h"
 #include <iostream>
@@ -20,8 +20,9 @@ Level::~Level()
 void Level::init(int level_number, bool show_menu)
 {
     // Set the current level number
-    //m_level_number = level_number;
-    m_level_number = 4;
+    m_level_number = level_number;
+    //m_level_number = 4;
+    // debug sudden death
 
     // Initialize powerup spawning variables
     m_elapsed_time = 0.0f;
@@ -54,8 +55,8 @@ void Level::init(int level_number, bool show_menu)
         m_powerups_spawned_level4 = 0;
     }
 
-    // Reset the level timer to 60 seconds
-    m_level_timer = 600.0f;
+    // Reset the level timer to 30 seconds
+    m_level_timer = 50.0f;
 
     // Clear existing obstacles and powerups
     m_obstacles.clear();
@@ -82,11 +83,15 @@ void Level::init(int level_number, bool show_menu)
 
     if (show_menu)
     {
-        // Initialize Menu
-        m_menu = std::make_unique<Menu>(MenuType::MAIN_MENU);
-        m_level_state = LevelState::MAIN_MENU;
+        // **Determine Menu Type Based on Level Number**
+        MenuType current_menu_type = (level_number == 1) ? MenuType::MAIN_MENU : MenuType::PAUSE_MENU;
 
-        std::cout << "Level " << m_level_number << " initialized with Main Menu.\n";
+        // Initialize Menu with the determined type
+        m_menu = std::make_unique<Menu>(current_menu_type);
+        m_level_state = (current_menu_type == MenuType::MAIN_MENU) ? LevelState::MAIN_MENU : LevelState::PAUSE_MENU;
+
+        std::cout << "Level " << m_level_number << " initialized with "
+            << ((current_menu_type == MenuType::MAIN_MENU) ? "Main Menu." : "Pause Menu.") << "\n";
     }
     else
     {
@@ -532,6 +537,10 @@ void Level::update(float dt)
         // **4. Collision Detection with Player Paddles**
         if (m_ball && m_ball->isActive())
         {
+            if (!m_ball->isActivePowerup()) {
+                m_speed_multiplier = 1.0f; // Reset speed multiplier if no active powerup present
+            }
+
             // Create a Box representing the ball's current position and size
             Box ballBox(m_ball->getX(), m_ball->getY(), m_ball->getWidth(), m_ball->getHeight());
 
@@ -827,9 +836,9 @@ void Level::update(float dt)
 
             if (m_menu->isReadyPressed())
             {
-                if (m_level_number < 4)
+                if (m_level_number <= 4)
                 {
-                    init(m_level_number + 1, false); // Initialize the next level
+                    init(m_level_number, false); // Initialize the next level
                     m_level_state = LevelState::ACTIVE;
                     std::cout << "Starting Level " << m_level_number << ".\n";
                 }
@@ -852,17 +861,41 @@ void Level::update(float dt)
             break;
 
         case LevelState::GAME_OVER:
-            // Handle Game Over logic, such as displaying a message or resetting the game
-            std::cout << "Game Over. Resetting to Main Menu.\n";
+        {
+            // **Initialize Game Over Menu if Not Already Initialized**
+            if (!m_menu || m_menu->getMenuType() != MenuType::GAME_OVER_MENU)
+            {
+                m_menu = std::make_unique<Menu>(MenuType::GAME_OVER_MENU);
+                std::cout << "Game Over Menu initialized.\n";
+            }
 
-            // Reset player scores and game winner
-            m_player1_score = 0;
-            m_player2_score = 0;
-            m_winner = 0;
+            // **Update the Game Over Menu**
+            m_menu->update();
 
-            init(1, true); // Reset to Level 1 or handle as needed
-            m_level_state = LevelState::MAIN_MENU;
+            // **Handle Input: Press SPACE to Return to Main Menu**
+            if (m_menu->isPlayClicked())
+            {
+                // **Reset Player Scores and Winner**
+                m_player1_score = 0;
+                m_player2_score = 0;
+                m_winner = 0;
+
+                // **Initialize Main Menu**
+                init(1, true); // Reset to Level 1 with Main Menu
+                m_level_state = LevelState::MAIN_MENU;
+                std::cout << "Returning to Main Menu.\n";
+            }
+
+            // **Handle Input: Press E to Exit Game**
+            if (m_menu->isExitClicked())
+            {
+                std::cout << "Exit pressed. Closing game.\n";
+                graphics::destroyWindow(); // Ensure this correctly closes the game window
+                exit(0); // Terminate the program
+            }
+
             break;
+        }
     }
     
 }
@@ -874,7 +907,6 @@ void Level::draw() const
 {
     switch (m_level_state) {
     case LevelState::MAIN_MENU:
-    case LevelState::PAUSE_MENU:
     {
         // OPTIONAL: Draw a background or tinted overlay so the menu is visible.
         // Example tinted overlay:
@@ -899,6 +931,30 @@ void Level::draw() const
         break;
     }
         
+    case LevelState::PAUSE_MENU:
+    {
+        // OPTIONAL: Draw a background or tinted overlay so the menu is visible.
+        // Example tinted overlay:
+        graphics::Brush bg_br;
+        bg_br.fill_color[0] = 0.0f;
+        bg_br.fill_color[1] = 0.0f;
+        bg_br.fill_color[2] = 0.0f;
+        bg_br.fill_opacity = 0.5f; // semi-transparent overlay
+        bg_br.outline_opacity = 0.0f;
+        graphics::drawRect(
+            CANVAS_WIDTH / 2.0f,
+            CANVAS_HEIGHT / 2.0f,
+            CANVAS_WIDTH,
+            CANVAS_HEIGHT,
+            bg_br
+        );
+
+        if (m_menu)
+        {
+            m_menu->draw();
+        }
+        break;
+    }
 
     case LevelState::ACTIVE: {
         // Draw the background
@@ -939,12 +995,49 @@ void Level::draw() const
         text_br.fill_color[1] = 1.0f;
         text_br.fill_color[2] = 1.0f;
 
-        std::string info = "Level " + std::to_string(m_level_number) +
-            " | Time left: " + std::to_string(static_cast<int>(m_level_timer)) +
-            " | P1 Score: " + std::to_string(m_player1_score) +
-            " | P2 Score: " + std::to_string(m_player2_score);
+        // 1. Draw P1 Score on the Left
+        std::string p1_info = "P1 Score: " + std::to_string(m_player1_score);
+        graphics::drawText(
+            20.0f,                               // X position (left margin)
+            30.0f,                               // Y position
+            20.0f,                               // Font size
+            p1_info,                             // Text to display
+            text_br                              // Brush settings
+        );
 
-        graphics::drawText(20.0f, 30.0f, 20.0f, info, text_br);
+        // 2. Draw Level and Time in the Center
+        if (m_level_number == 4) {
+            std::string center_info = "Level " + std::to_string(m_level_number) +
+                "   |   Time left: N/A";
+            graphics::drawText(
+                CANVAS_WIDTH / 2.0f - 100.0f,        // X position (centered horizontally)
+                30.0f,                               // Y position
+                20.0f,                               // Font size
+                center_info,                         // Text to display
+                text_br                              // Brush settings
+            );
+        }
+        else {
+            std::string center_info = "Level " + std::to_string(m_level_number) +
+                "   |   Time left: " + std::to_string(static_cast<int>(m_level_timer / 10));
+            graphics::drawText(
+                CANVAS_WIDTH / 2.0f - 100.0f,        // X position (centered horizontally)
+                30.0f,                               // Y position
+                20.0f,                               // Font size
+                center_info,                         // Text to display
+                text_br                              // Brush settings
+            );
+        }
+        
+        // 3. Draw P2 Score on the Right
+        std::string p2_info = "P2 Score: " + std::to_string(m_player2_score);
+        graphics::drawText(
+            CANVAS_WIDTH - 115.0f,               // X position (right margin)
+            30.0f,                               // Y position
+            20.0f,                               // Font size
+            p2_info,                             // Text to display
+            text_br                              // Brush settings
+        );
         break;
     }
 
@@ -1015,7 +1108,7 @@ void Level::nextLevel()
     if (m_level_number < 3)
     {
         m_level_number++;
-        init(m_level_number);
+        init(m_level_number, true); // Show Pause Menu for Level 2 and 3
         std::cout << "Advancing to Level " << m_level_number << ".\n";
     }
     else if (m_level_number == 3)
@@ -1039,17 +1132,15 @@ void Level::nextLevel()
         {
             // Scores are equal, start sudden death
             m_level_number = 4;
-            init(m_level_number);
+            init(m_level_number, true); // Show Pause Menu or Ready Menu for Sudden Death
             std::cout << "Scores tied. Advancing to Level 4: Sudden Death.\n";
         }
     }
     else
     {
-        // Level 4 completed: Game Over
-        std::cout << "Sudden Death completed. Game Over.\n";
-        // Implement game over logic here (e.g., show a game over screen)
-        // For demonstration, we'll reset to Level 1
-        init(1);
-        std::cout << "Resetting to Level 1.\n";
+        // **After Level 4: Transition to GAME_OVER**
+        m_level_state = LevelState::GAME_OVER;
+        std::cout << "Sudden Death completed. Transitioning to Game Over.\n";
     }
 }
+

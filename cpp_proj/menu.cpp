@@ -55,10 +55,10 @@ void Menu::draw() const
     );
 
     // 2) Set the font and define a brush for text
-    graphics::setFont(GameState::getInstance()->getFullAssetPath("Minecraft.ttf"));
+    graphics::setFont(GameState::getInstance()->getFullAssetPath("ARIAL.ttf"));
     graphics::resetPose();
     graphics::Brush text_br;
-    text_br.fill_color[0] = 1.0f;
+    text_br.fill_color[0] = 1.0f;   // White text
     text_br.fill_color[1] = 1.0f;
     text_br.fill_color[2] = 1.0f;
     text_br.outline_opacity = 0.0f;
@@ -67,38 +67,80 @@ void Menu::draw() const
     // 3) Draw text according to the current menu type
     if (m_type == MenuType::MAIN_MENU)
     {
+        // **a. Draw Title "Advanced Pong"**
         graphics::drawText(
-            CANVAS_WIDTH / 2.0f - 120.0f,
-            CANVAS_HEIGHT / 2.0f - 30.0f,
+            CANVAS_WIDTH / 2.0f - 130.0f,    // Center the title horizontally
+            CANVAS_HEIGHT / 2.0f - 100.0f,   // Place title higher
+            40.0f,                           // Font size for title
+            "Advanced Pong",
+            text_br
+        );
+
+        // **b. Draw Play Button Text**
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 130.0f,    // Center horizontally
+            CANVAS_HEIGHT / 2.0f - 20.0f,    // Adjust position below the title
             30.0f,
             "Press SPACE to Play",
             text_br
         );
 
+        // **c. Draw Exit Button Text**
         graphics::drawText(
-            CANVAS_WIDTH / 2.0f - 90.0f, 
-            CANVAS_HEIGHT / 2.0f + 30.0f,
+            CANVAS_WIDTH / 2.0f - 130.0f,    // Center horizontally
+            CANVAS_HEIGHT / 2.0f + 40.0f,    // Adjust position below the play text
             30.0f,
-            "press e to exit",
+            "Press E to Exit Game",
             text_br
         );
     }
 
     else if (m_type == MenuType::PAUSE_MENU)
     {
+        // Centered "Ready?"
         graphics::drawText(
-            CANVAS_WIDTH / 2.0f - 50.0f,
-            CANVAS_HEIGHT / 2.0f,
-            50.0f,
-            "ready?",
+            CANVAS_WIDTH / 2.0f - 75.0f,    // Adjusted to center horizontally
+            CANVAS_HEIGHT / 2.0f - 20.0f,   // Centered vertically
+            50.0f,                          // Font size for "Ready?"
+            "Ready?",
             text_br
         );
 
+        // Centered "Press SPACE to Continue"
         graphics::drawText(
-            CANVAS_WIDTH / 2.0f - 120.0f,
-            CANVAS_HEIGHT / 2.0f + 60.0f,
-            20.0f,
-            "press space to continue",
+            CANVAS_WIDTH / 2.0f - 105.0f,   // Adjusted to center horizontally
+            CANVAS_HEIGHT / 2.0f + 40.0f,   // Positioned below "Ready?"
+            20.0f,                          // Font size for instructions
+            "Press SPACE to Continue",
+            text_br
+        );
+    }
+    else if (m_type == MenuType::GAME_OVER_MENU)
+    {
+        // **a. Draw "Game Over" Title**
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 100.0f,    // Centered horizontally
+            CANVAS_HEIGHT / 2.0f - 100.0f,   // Positioned higher vertically
+            50.0f,                            // Font size
+            "Game Over",
+            text_br
+        );
+
+        // **b. Draw "Press SPACE to Main Menu" Instruction**
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 150.0f,    // Centered horizontally
+            CANVAS_HEIGHT / 2.0f,             // Centered vertically
+            30.0f,                            // Font size
+            "Press SPACE to Play Again",
+            text_br
+        );
+
+        // **c. Draw "Press E to Exit Game" Instruction**
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 130.0f,    // Centered horizontally
+            CANVAS_HEIGHT / 2.0f + 40.0f,    // Positioned below the first instruction
+            30.0f,                            // Font size
+            "Press E to Exit Game",
             text_br
         );
     }
@@ -148,6 +190,29 @@ void Menu::update()
 
         // Update previous state
         m_previous_spacebar_state = current_spacebar;
+    }   
+    else if (m_type == MenuType::GAME_OVER_MENU)
+    {
+        bool current_spacebar = graphics::getKeyState(graphics::SCANCODE_SPACE);
+        bool current_e = graphics::getKeyState(graphics::SCANCODE_E);
+
+        // **a. Detect SPACE Press for Returning to Main Menu**
+        if (current_spacebar && !m_previous_spacebar_state)
+        {
+            m_play_clicked = true; // Reuse the play_clicked flag for Main Menu return
+            std::cout << "Main Menu pressed (Spacebar).\n";
+        }
+
+        // **b. Detect E Press for Exiting the Game**
+        if (current_e && !m_previous_e_state)
+        {
+            m_exit_clicked = true;
+            std::cout << "Exit button pressed ('E').\n";
+        }
+
+        // **c. Update Previous Key States**
+        m_previous_spacebar_state = current_spacebar;
+        m_previous_e_state = current_e;
     }
 }
 

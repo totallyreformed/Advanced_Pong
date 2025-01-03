@@ -54,6 +54,12 @@ public:
      */
     void setMenuType(MenuType type);
 
+	/**
+    * @brief Retrieves the current menu type.
+	* @return The current menu type.
+	*/
+	MenuType getMenuType() const { return m_type; }
+
     /**
      * @brief Checks if the Play button was pressed (Main Menu only).
      * @return True if Play was pressed, otherwise False.

@@ -24,7 +24,7 @@ private:
     int m_level_number = 1;
 
     // Timer for each level (1 minute = 60.0f seconds)
-    float m_level_timer = 600.0f;
+    float m_level_timer = 300.0f;
 
     // Powerup spawning variables
     float m_elapsed_time;                     // Tracks elapsed time since level start
