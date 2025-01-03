@@ -16,7 +16,9 @@ Ball::Ball(GameState* gs, const std::string& name,
     m_speed(speed),
     m_speed_x(speed),
     m_speed_y(speed),
-    m_reset_timer(1.0f, Timer::TIMER_ONCE)
+    m_reset_timer(1.0f, Timer::TIMER_ONCE),
+	m_base_width(width),
+	m_base_height(height)
 {
     setWidth(width);
     setHeight(height);
@@ -99,6 +101,10 @@ void Ball::reset()
 {
     setX(m_state->getCanvasWidth() / 2.0f);
     setY(m_state->getCanvasHeight() / 2.0f);
+    setWidth(m_base_width);
+    setHeight(m_base_height);
+    clearActivePowerups();
+
     m_reset_timer.stop();
 
     m_speed_x = 0.0f;
@@ -173,13 +179,13 @@ void Ball::applyPowerup(Powerup::Type type)
         std::cout << "POWERUP: SLOW_DOWN applied.\n";
         break;
     case Powerup::Type::INCREASE_SIZE:
-        setWidth(getWidth() * 1.4f);
-        setHeight(getHeight() * 1.4f);
+        setWidth(m_base_width * 1.4f);
+        setHeight(m_base_height * 1.4f);
         std::cout << "POWERUP: INCREASE_SIZE applied.\n";
         break;
     case Powerup::Type::DECREASE_SIZE:
-        setWidth(getWidth() * 0.7f);
-        setHeight(getHeight() * 0.7f);
+        setWidth(m_base_width * 0.7f);
+        setHeight(m_base_height * 0.7f);
         std::cout << "POWERUP: DECREASE_SIZE applied.\n";
         break;
     }
@@ -207,13 +213,13 @@ void Ball::updatePowerups()
                 std::cout << "POWERUP: SLOW_DOWN expired.\n";
                 break;
             case Powerup::Type::INCREASE_SIZE:
-                setWidth(getWidth() / 1.4f);
-                setHeight(getHeight() / 1.4f);
+                setWidth(m_base_width);
+                setHeight(m_base_height);
                 std::cout << "POWERUP: INCREASE_SIZE expired.\n";
                 break;
             case Powerup::Type::DECREASE_SIZE:
-                setWidth(getWidth() / 0.7f);
-                setHeight(getHeight() / 0.7f);
+                setWidth(m_base_width);
+                setHeight(m_base_height);
                 std::cout << "POWERUP: DECREASE_SIZE expired.\n";
                 break;
             }

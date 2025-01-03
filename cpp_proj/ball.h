@@ -18,6 +18,8 @@ private:
     float m_speed;            // Constant base speed of the ball.
     float m_speed_x;          // Current speed on the x-axis.
     float m_speed_y;          // Current speed on the y-axis.
+    float m_base_width;
+    float m_base_height;
 
     // Struct holding active powerup effects
     struct ActivePowerup {
