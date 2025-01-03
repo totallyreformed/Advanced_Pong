@@ -875,10 +875,30 @@ void Level::draw() const
     switch (m_level_state) {
     case LevelState::MAIN_MENU:
     case LevelState::PAUSE_MENU:
-        if (m_menu) {
+    {
+        // OPTIONAL: Draw a background or tinted overlay so the menu is visible.
+        // Example tinted overlay:
+        graphics::Brush bg_br;
+        bg_br.fill_color[0] = 0.0f;
+        bg_br.fill_color[1] = 0.0f;
+        bg_br.fill_color[2] = 0.0f;
+        bg_br.fill_opacity = 0.5f; // semi-transparent overlay
+        bg_br.outline_opacity = 0.0f;
+        graphics::drawRect(
+            CANVAS_WIDTH / 2.0f,
+            CANVAS_HEIGHT / 2.0f,
+            CANVAS_WIDTH,
+            CANVAS_HEIGHT,
+            bg_br
+        );
+
+        if (m_menu)
+        {
             m_menu->draw();
         }
         break;
+    }
+        
 
     case LevelState::ACTIVE: {
         // Draw the background

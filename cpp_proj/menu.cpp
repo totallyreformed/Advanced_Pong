@@ -1,11 +1,12 @@
-// Menu.cpp
+﻿// Menu.cpp
 #include "Menu.h"
 #include "sgg/graphics.h"
 #include <iostream>
 #include "config.h"
+#include "gamestate.h"
 
 /**
- * @brief Constructor initializes the menu type and flags.
+ * @text_brief Constructor initializes the menu type and flags.
  * @param type The type of menu to initialize.
  */
 Menu::Menu(MenuType type)
@@ -14,7 +15,7 @@ Menu::Menu(MenuType type)
 }
 
 /**
- * @brief Sets the menu type and resets flags.
+ * @text_brief Sets the menu type and resets flags.
  * @param type The new type of the menu.
  */
 void Menu::setMenuType(MenuType type)
@@ -24,7 +25,7 @@ void Menu::setMenuType(MenuType type)
 }
 
 /**
- * @brief Resets the menu state flags.
+ * @text_brief Resets the menu state flags.
  */
 void Menu::resetFlags()
 {
@@ -34,44 +35,78 @@ void Menu::resetFlags()
 }
 
 /**
- * @brief Draws the menu based on its type.
+ * @text_brief Draws the menu based on its type.
  */
 void Menu::draw() const
 {
-    graphics::Brush br;
-    br.fill_color[0] = 0.0f; // Black background
-    br.fill_color[1] = 0.0f;
-    br.fill_color[2] = 0.0f;
-    br.fill_opacity = 1.0f;
-    br.outline_opacity = 0.0f;
+    // 1) Draw a semi-transparent background/overlay
+    graphics::Brush bg_br;
+    bg_br.fill_color[0] = 0.0f;    // Black
+    bg_br.fill_color[1] = 0.0f;
+    bg_br.fill_color[2] = 0.0f;
+    bg_br.outline_opacity = 0.0f;
+    bg_br.fill_opacity = 0.5f;     // Semi-transparent
+    graphics::drawRect(
+        CANVAS_WIDTH / 2.0f,
+        CANVAS_HEIGHT / 2.0f,
+        CANVAS_WIDTH,
+        CANVAS_HEIGHT,
+        bg_br
+    );
 
-    // Draw full-screen rectangle as background
-    graphics::drawRect(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f, CANVAS_WIDTH, CANVAS_HEIGHT, br);
+    // 2) Set the font and define a brush for text
+    graphics::setFont(GameState::getInstance()->getFullAssetPath("Minecraft.ttf"));
+    graphics::resetPose();
+    graphics::Brush text_br;
+    text_br.fill_color[0] = 1.0f;
+    text_br.fill_color[1] = 1.0f;
+    text_br.fill_color[2] = 1.0f;
+    text_br.outline_opacity = 0.0f;
+    text_br.fill_opacity = 1.0f;
 
-    br.fill_color[0] = 1.0f; // White text
-    br.fill_color[1] = 1.0f;
-    br.fill_color[2] = 1.0f;
-    br.fill_opacity = 1.0f;
-    br.outline_opacity = 0.0f;
-
+    // 3) Draw text according to the current menu type
     if (m_type == MenuType::MAIN_MENU)
     {
-        // Draw Play Button Text
-        graphics::drawText(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f - 50.0f, 30.0f, "Press SPACE to Play", br);
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 120.0f,
+            CANVAS_HEIGHT / 2.0f - 30.0f,
+            30.0f,
+            "Press SPACE to Play",
+            text_br
+        );
 
-        // Draw Exit Button Text
-        graphics::drawText(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f + 50.0f, 30.0f, "Press E to Exit", br);
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 90.0f, 
+            CANVAS_HEIGHT / 2.0f + 30.0f,
+            30.0f,
+            "press e to exit",
+            text_br
+        );
     }
+
     else if (m_type == MenuType::PAUSE_MENU)
     {
-        // Draw Ready? Sign
-        graphics::drawText(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f, 50.0f, "Ready?", br);
-        graphics::drawText(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f + 60.0f, 20.0f, "Press SPACE to Continue", br);
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 50.0f,
+            CANVAS_HEIGHT / 2.0f,
+            50.0f,
+            "ready?",
+            text_br
+        );
+
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 120.0f,
+            CANVAS_HEIGHT / 2.0f + 60.0f,
+            20.0f,
+            "press space to continue",
+            text_br
+        );
     }
 }
 
+
 /**
- * @brief Handles input events for the menu.
+ * @text_brief Handles input events for the menu.
  */
 void Menu::update()
 {
@@ -117,7 +152,7 @@ void Menu::update()
 }
 
 /**
- * @brief Checks if the Play button was pressed (Main Menu only).
+ * @text_brief Checks if the Play button was pressed (Main Menu only).
  * @return True if Play was pressed, otherwise False.
  */
 bool Menu::isPlayClicked() const
@@ -126,7 +161,7 @@ bool Menu::isPlayClicked() const
 }
 
 /**
- * @brief Checks if the Exit button was pressed (Main Menu only).
+ * @text_brief Checks if the Exit button was pressed (Main Menu only).
  * @return True if Exit was pressed, otherwise False.
  */
 bool Menu::isExitClicked() const
@@ -135,7 +170,7 @@ bool Menu::isExitClicked() const
 }
 
 /**
- * @brief Checks if the Ready button was pressed (Pause Menu only).
+ * @text_brief Checks if the Ready button was pressed (Pause Menu only).
  * @return True if Ready (spacebar) was pressed, otherwise False.
  */
 bool Menu::isReadyPressed() const
