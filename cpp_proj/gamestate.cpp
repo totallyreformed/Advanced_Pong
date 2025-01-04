@@ -124,13 +124,6 @@ void GameState::update(float dt)
         return;
     }
 
-    // Ensure that updates do not occur too rapidly by enforcing a minimum frame time
-    float sleep_time = std::max(17.0f - dt, 0.0f); // Approximately 60 FPS
-    if (sleep_time > 0.0f)
-    {
-        std::this_thread::sleep_for(std::chrono::duration<float, std::milli>(sleep_time));
-    }
-
     if (!level)
     {
         std::cout << "No active level to update.\n";
