@@ -12,6 +12,10 @@
 Menu::Menu(MenuType type)
     : m_type(type), m_play_clicked(false), m_exit_clicked(false), m_ready_pressed(false)
 {
+    // **Initialize the Background Brush**
+    m_bg_brush.texture = GameState::getInstance()->getFullAssetPath("background.png");
+    m_bg_brush.fill_opacity = 0.17f;     // Semi-transparent fill
+    m_bg_brush.outline_opacity = 0.0f;  // No outline
 }
 
 /**
@@ -39,22 +43,27 @@ void Menu::resetFlags()
  */
 void Menu::draw() const
 {
-    // 1) Draw a semi-transparent background/overlay
-    graphics::Brush bg_br;
-    bg_br.fill_color[0] = 0.0f;    // Black
-    bg_br.fill_color[1] = 0.0f;
-    bg_br.fill_color[2] = 0.0f;
-    bg_br.outline_opacity = 0.0f;
-    bg_br.fill_opacity = 0.5f;     // Semi-transparent
+    // **Draw the Background Rectangle Covering the Entire Canvas**
     graphics::drawRect(
-        CANVAS_WIDTH / 2.0f,
-        CANVAS_HEIGHT / 2.0f,
-        CANVAS_WIDTH,
-        CANVAS_HEIGHT,
-        bg_br
+        CANVAS_WIDTH / 2.0f,    // Center X
+        CANVAS_HEIGHT / 2.0f,   // Center Y
+        CANVAS_WIDTH,            // Width
+        CANVAS_HEIGHT,           // Height
+        m_bg_brush               // Brush with texture and opacity
     );
 
     // 2) Set the font and define a brush for text
+
+    // Create a Separate Brush for the Title
+    graphics::resetPose();
+    graphics::Brush title_br;
+    title_br.fill_color[0] = 0.0f; // Red component (0.0f - 1.0f)
+    title_br.fill_color[1] = 0.5f; // Green component (0.0f - 1.0f)
+    title_br.fill_color[2] = 1.0f; // Blue component (0.0f - 1.0f)
+    title_br.fill_opacity = 1.0f;  // Fully opaque
+    title_br.outline_opacity = 0.0f; // No outline
+
+
     graphics::setFont(GameState::getInstance()->getFullAssetPath("ARIAL.ttf"));
     graphics::resetPose();
     graphics::Brush text_br;
@@ -69,11 +78,11 @@ void Menu::draw() const
     {
         // **a. Draw Title "Advanced Pong"**
         graphics::drawText(
-            CANVAS_WIDTH / 2.0f - 130.0f,    // Center the title horizontally
+            CANVAS_WIDTH / 2.0f - 195.0f,    // Center the title horizontally
             CANVAS_HEIGHT / 2.0f - 100.0f,   // Place title higher
-            40.0f,                           // Font size for title
+            60.0f,                           // Font size for title
             "Advanced Pong",
-            text_br
+            title_br
         );
 
         // **b. Draw Play Button Text**
@@ -193,14 +202,14 @@ void Menu::update()
     }   
     else if (m_type == MenuType::GAME_OVER_MENU)
     {
-        bool current_spacebar = graphics::getKeyState(graphics::SCANCODE_SPACE);
+        bool current_r = graphics::getKeyState(graphics::SCANCODE_R);
         bool current_e = graphics::getKeyState(graphics::SCANCODE_E);
 
-        // **a. Detect SPACE Press for Returning to Main Menu**
-        if (current_spacebar && !m_previous_spacebar_state)
+        // **a. Detect R Press for Returning to Main Menu**
+        if (current_r && !m_previous_spacebar_state)
         {
             m_play_clicked = true; // Reuse the play_clicked flag for Main Menu return
-            std::cout << "Main Menu pressed (Spacebar).\n";
+            std::cout << "Main Menu pressed (R).\n";
         }
 
         // **b. Detect E Press for Exiting the Game**
@@ -211,7 +220,7 @@ void Menu::update()
         }
 
         // **c. Update Previous Key States**
-        m_previous_spacebar_state = current_spacebar;
+        m_previous_r_state = current_r;
         m_previous_e_state = current_e;
     }
 }

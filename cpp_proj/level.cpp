@@ -63,7 +63,7 @@ void Level::init(int level_number, bool show_menu)
     }
 
     // Reset the level timer to 30 seconds
-    m_level_timer = 300.0f;
+    m_level_timer = 30.0f;
 
     // Clear existing obstacles and powerups
     m_obstacles.clear();
@@ -931,56 +931,13 @@ void Level::draw() const
 {
     switch (m_level_state) {
     case LevelState::MAIN_MENU:
-    {
-        // OPTIONAL: Draw a background or tinted overlay so the menu is visible.
-        // Example tinted overlay:
-        graphics::Brush bg_br;
-        bg_br.fill_color[0] = 0.0f;
-        bg_br.fill_color[1] = 0.0f;
-        bg_br.fill_color[2] = 0.0f;
-        bg_br.fill_opacity = 0.5f; // semi-transparent overlay
-        bg_br.outline_opacity = 0.0f;
-        graphics::drawRect(
-            CANVAS_WIDTH / 2.0f,
-            CANVAS_HEIGHT / 2.0f,
-            CANVAS_WIDTH,
-            CANVAS_HEIGHT,
-            bg_br
-        );
-
-        // Draw the menu
-        if (m_menu)
-        {
-            m_menu->draw();
-        }
-        break;
-    }
-        
     case LevelState::PAUSE_MENU:
-    {
-        // OPTIONAL: Draw a background or tinted overlay so the menu is visible.
-        // Example tinted overlay:
-        graphics::Brush bg_br;
-        bg_br.fill_color[0] = 0.0f;
-        bg_br.fill_color[1] = 0.0f;
-        bg_br.fill_color[2] = 0.0f;
-        bg_br.fill_opacity = 0.5f; // semi-transparent overlay
-        bg_br.outline_opacity = 0.0f;
-        graphics::drawRect(
-            CANVAS_WIDTH / 2.0f,
-            CANVAS_HEIGHT / 2.0f,
-            CANVAS_WIDTH,
-            CANVAS_HEIGHT,
-            bg_br
-        );
-
         // Draw the Pause Menu
         if (m_menu)
         {
             m_menu->draw();
         }
         break;
-    }
 
     case LevelState::ACTIVE: {
         // Draw the background
@@ -1068,6 +1025,15 @@ void Level::draw() const
     }
 
     case LevelState::GAME_OVER: {
+        // Draw the background
+        graphics::drawRect(
+            CANVAS_WIDTH / 2.0f,    // X position (centered horizontally)
+            CANVAS_HEIGHT / 2.0f,   // Y position (centered vertically)
+            CANVAS_WIDTH,            // Width of the rectangle
+            CANVAS_HEIGHT,           // Height of the rectangle
+            m_bg_brush               // Brush with texture and opacity
+        );
+
         // Draw Game Over screen with winner info
         graphics::Brush br;
         br.outline_opacity = 0.0f;
@@ -1106,6 +1072,21 @@ void Level::draw() const
         score_br.fill_color[2] = 1.0f;
         score_br.outline_opacity = 0.0f;
         graphics::drawText(CANVAS_WIDTH / 2.0f - 148.0f, CANVAS_HEIGHT / 2.0f + 10.0f, 30.0f, final_score, score_br);
+
+        // **Add Replay Instruction Below Final Scores**
+        std::string replay_info = "Press R to Replay the Game";
+        graphics::Brush replay_br;
+        replay_br.fill_color[0] = 1.0f; // White color
+        replay_br.fill_color[1] = 1.0f;
+        replay_br.fill_color[2] = 1.0f;
+        replay_br.outline_opacity = 0.0f;
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 168.0f, // X position (centered horizontally)
+            CANVAS_HEIGHT / 2.0f + 50.0f, // Y position (below final scores)
+            30.0f,                        // Font size
+            replay_info,                  // Text to display
+            replay_br                     // Brush settings
+        );
 
         break;
     }
@@ -1172,9 +1153,15 @@ void Level::nextLevel()
     }
     else
     {
-        // **After Level 4: Transition to GAME_OVER**
-        m_level_state = LevelState::GAME_OVER;
-        std::cout << "Sudden Death completed. Transitioning to Game Over.\n";
+        // **After Level 4: Reset the game by displaying the Main Menu**
+
+        // **Reset the level number to 1 to prepare for a new game**
+        m_level_number = 1;
+
+        // **Initialize Level 1 with the Main Menu**
+        init(m_level_number, true); // Show Main Menu for Level 1
+
+        std::cout << "Sudden Death completed. Returning to Main Menu.\n";
     }
 }
 

@@ -30,6 +30,10 @@ private:
     // Debounce flags to prevent multiple triggers from a single key press
     bool m_previous_spacebar_state = false;
     bool m_previous_e_state = false;
+    bool m_previous_r_state = false;
+
+    // Declare the Background Brush
+    graphics::Brush m_bg_brush;
 
 public:
     /**
