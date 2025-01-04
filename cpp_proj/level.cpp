@@ -1025,7 +1025,7 @@ void Level::draw() const
     }
 
     case LevelState::GAME_OVER: {
-        // Draw the background
+        // **a. Draw the Background Rectangle Covering the Entire Canvas**
         graphics::drawRect(
             CANVAS_WIDTH / 2.0f,    // X position (centered horizontally)
             CANVAS_HEIGHT / 2.0f,   // Y position (centered vertically)
@@ -1034,17 +1034,25 @@ void Level::draw() const
             m_bg_brush               // Brush with texture and opacity
         );
 
-        // Draw Game Over screen with winner info
+        // **b. Draw Game Over Screen with Winner Information**
         graphics::Brush br;
-        br.outline_opacity = 0.0f;
+        br.outline_opacity = 0.0f; // No outline
 
         std::string winner_text;
+        std::string sudden_death_text; // New string for Sudden Death indication
+
         if (m_winner == 1)
         {
             br.fill_color[0] = 0.0f; // Blue color for Player1
             br.fill_color[1] = 0.0f;
             br.fill_color[2] = 1.0f;
             winner_text = "Player 1 Wins!";
+
+            // **Check if the win was through Sudden Death**
+            if (m_level_number == 4)
+            {
+                sudden_death_text = "(In Sudden Death)";
+            }
         }
         else if (m_winner == 2)
         {
@@ -1052,6 +1060,12 @@ void Level::draw() const
             br.fill_color[1] = 0.0f;
             br.fill_color[2] = 0.0f;
             winner_text = "Player 2 Wins!";
+
+            // **Check if the win was through Sudden Death**
+            if (m_level_number == 4)
+            {
+                sudden_death_text = "(In Sudden Death)";
+            }
         }
         else
         {
@@ -1059,11 +1073,31 @@ void Level::draw() const
             br.fill_color[1] = 1.0f;
             br.fill_color[2] = 1.0f;
             winner_text = "Game Over";
+            // No Sudden Death text needed
         }
 
-        graphics::drawText(CANVAS_WIDTH / 2.0f - 140.0f, CANVAS_HEIGHT / 2.0f - 50.0f, 50.0f, winner_text, br);
+        // **Draw the Winner Text at the Center of the Screen**
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 140.0f, // X position (adjusted for centering)
+            CANVAS_HEIGHT / 2.0f - 50.0f, // Y position (placed higher on the screen)
+            50.0f,                         // Font size for the winner text
+            winner_text,                   // Text to display
+            br                             // Brush settings for the text
+        );
 
-        // Display final scores
+        // **c. Draw "In Sudden Death!" Text if Applicable**
+        if (!sudden_death_text.empty())
+        {
+            graphics::drawText(
+                CANVAS_WIDTH / 2.0f - 100.0f,  // X position (adjusted for centering)
+                CANVAS_HEIGHT / 2.0f - 10.0f, // Y position (placed below the winner text)
+                30.0f,                         // Font size for Sudden Death text
+                sudden_death_text,             // Text to display
+                br                             // Brush settings for the text
+            );
+        }
+
+        // **d. Display Final Scores Below the Winner Text**
         std::string final_score = "Final Scores - P1: " + std::to_string(m_player1_score) +
             " | P2: " + std::to_string(m_player2_score);
         graphics::Brush score_br;
@@ -1071,9 +1105,15 @@ void Level::draw() const
         score_br.fill_color[1] = 1.0f;
         score_br.fill_color[2] = 1.0f;
         score_br.outline_opacity = 0.0f;
-        graphics::drawText(CANVAS_WIDTH / 2.0f - 148.0f, CANVAS_HEIGHT / 2.0f + 10.0f, 30.0f, final_score, score_br);
+        graphics::drawText(
+            CANVAS_WIDTH / 2.0f - 148.0f, // X position (centered horizontally)
+            CANVAS_HEIGHT / 2.0f + 30.0f,  // Y position (placed below the winner text)
+            30.0f,                         // Font size for the final scores
+            final_score,                   // Text to display
+            score_br                       // Brush settings for the text
+        );
 
-        // **Add Replay Instruction Below Final Scores**
+        // **e. Add Replay Instruction Below Final Scores**
         std::string replay_info = "Press R to Replay the Game";
         graphics::Brush replay_br;
         replay_br.fill_color[0] = 1.0f; // White color
@@ -1082,7 +1122,7 @@ void Level::draw() const
         replay_br.outline_opacity = 0.0f;
         graphics::drawText(
             CANVAS_WIDTH / 2.0f - 168.0f, // X position (centered horizontally)
-            CANVAS_HEIGHT / 2.0f + 50.0f, // Y position (below final scores)
+            CANVAS_HEIGHT / 2.0f + 70.0f, // Y position (placed below final scores)
             30.0f,                        // Font size
             replay_info,                  // Text to display
             replay_br                     // Brush settings
