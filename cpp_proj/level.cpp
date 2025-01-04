@@ -320,11 +320,12 @@ void Level::update(float dt)
         if (m_level_number == 4) {
             // **Sudden Death: Spawn Unbreakable Obstacles**
             if (m_unbreakable_obstacles_spawned_level4 < MAX_UNBREAKABLE_OBSTACLES &&
-                m_obstacles_spawned_level4 < m_unbreakable_obstacle_spawn_positions_level4.size() &&
+                m_obstacles_spawned_level4 < MAX_UNBREAKABLE_OBSTACLES &&
                 m_elapsed_time >= m_next_obstacle_spawn_time_level4)
             {
-                float ox = m_unbreakable_obstacle_spawn_positions_level4[m_unbreakable_obstacles_spawned_level4].first;
-                float oy = m_unbreakable_obstacle_spawn_positions_level4[m_unbreakable_obstacles_spawned_level4].second;
+                // Generate random position within boundaries
+                float ox = getRandomFloat(m_obstacle_spawn_min_x, m_obstacle_spawn_max_x);
+                float oy = getRandomFloat(m_obstacle_spawn_min_y, m_obstacle_spawn_max_y);
 
                 // Spawn an unbreakable obstacle
                 auto obstacle = std::make_unique<Obstacle>(
@@ -339,10 +340,7 @@ void Level::update(float dt)
                 m_unbreakable_obstacles_spawned_level4++;
 
                 // Schedule the next obstacle spawn time (e.g., add a random interval between 2-5 seconds)
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_real_distribution<float> dist_interval(2.0f, 5.0f);
-                float interval = dist_interval(gen);
+                float interval = getRandomFloat(2.0f, 5.0f);
                 m_next_obstacle_spawn_time_level4 = m_elapsed_time + interval;
 
                 std::cout << "Spawned Unbreakable Obstacle " << m_unbreakable_obstacles_spawned_level4
@@ -351,11 +349,11 @@ void Level::update(float dt)
 
             // **Sudden Death: Spawn Breakable Obstacles**
             if (m_breakable_obstacles_spawned_level4 < MAX_BREAKABLE_OBSTACLES &&
-                m_breakable_obstacle_spawn_positions_level4.size() > m_breakable_obstacles_spawned_level4 &&
                 m_elapsed_time >= m_next_breakable_obstacle_spawn_time_level4)
             {
-                float bx = m_breakable_obstacle_spawn_positions_level4[m_breakable_obstacles_spawned_level4].first;
-                float by = m_breakable_obstacle_spawn_positions_level4[m_breakable_obstacles_spawned_level4].second;
+                // Generate random position within boundaries
+                float bx = getRandomFloat(m_obstacle_spawn_min_x, m_obstacle_spawn_max_x);
+                float by = getRandomFloat(m_obstacle_spawn_min_y, m_obstacle_spawn_max_y);
 
                 // Spawn a breakable obstacle
                 auto obstacle = std::make_unique<Obstacle>(
@@ -370,10 +368,7 @@ void Level::update(float dt)
                 m_breakable_obstacles_spawned_level4++;
 
                 // Schedule the next breakable obstacle spawn time (e.g., add a random interval between 2-5 seconds)
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_real_distribution<float> dist_interval(2.0f, 5.0f);
-                float interval = dist_interval(gen);
+                float interval = getRandomFloat(2.0f, 5.0f);
                 m_next_breakable_obstacle_spawn_time_level4 = m_elapsed_time + interval;
 
                 std::cout << "Spawned Breakable Obstacle " << m_breakable_obstacles_spawned_level4
@@ -382,15 +377,15 @@ void Level::update(float dt)
 
             // **Sudden Death: Spawn Powerups**
             if (m_powerups_spawned_level4 < MAX_POWERUPS &&
-                m_powerups_spawned_level4 < m_powerup_spawn_positions_level4.size() &&
                 m_elapsed_time >= m_next_powerup_spawn_time_level4)
             {
-                float px = m_powerup_spawn_positions_level4[m_powerups_spawned_level4].first;
-                float py = m_powerup_spawn_positions_level4[m_powerups_spawned_level4].second;
+                // Generate random position within boundaries
+                float px = getRandomFloat(m_powerup_spawn_min_x, m_powerup_spawn_max_x);
+                float py = getRandomFloat(m_powerup_spawn_min_y, m_powerup_spawn_max_y);
 
-                // Determine powerup type based on spawn count, excluding SPEED_UP
+                // Determine powerup type based on spawn count, excluding SPEED_UP if needed
                 Powerup::Type type;
-                switch (m_powerups_spawned_level4)
+                switch (m_powerups_spawned_level4 % 4) // Cycle through 4 types
                 {
                 case 0: type = Powerup::Type::SLOW_DOWN; break;
                 case 1: type = Powerup::Type::INCREASE_SIZE; break;
@@ -441,10 +436,7 @@ void Level::update(float dt)
                     m_powerups_spawned_level4++;
 
                     // Schedule the next powerup spawn time (e.g., add a random interval between 2-5 seconds)
-                    std::random_device rd;
-                    std::mt19937 gen(rd());
-                    std::uniform_real_distribution<float> dist_interval(2.0f, 5.0f);
-                    float interval = dist_interval(gen);
+                    float interval = getRandomFloat(2.0f, 5.0f);
                     m_next_powerup_spawn_time_level4 = m_elapsed_time + interval;
 
                     std::cout << "Spawned Powerup " << m_powerups_spawned_level4 << " of type " << static_cast<int>(type)
@@ -456,6 +448,7 @@ void Level::update(float dt)
                 }
             }
         }
+
         
 
         // **2. Update Players, Ball, Obstacles, and Powerups**

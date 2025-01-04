@@ -37,26 +37,17 @@ private:
 
     std::vector<std::pair<float, float>> m_powerup_spawn_positions; // Predefined spawn positions for powerups
 
-    // **Predefined Spawn Positions for Level 4 Obstacles**
-    // Ensure these positions are spaced adequately
-    std::vector<std::pair<float, float>> m_unbreakable_obstacle_spawn_positions_level4 = {
-        {200.0f, 200.0f},  // First unbreakable obstacle position
-        {600.0f, 600.0f}   // Second unbreakable obstacle position
-    };
+    // **Spawn Boundaries for Level 4 (Sudden Death)**
+    // Define minimum and maximum X and Y coordinates for spawning obstacles and powerups
+    float m_obstacle_spawn_min_x = 200.0f;
+    float m_obstacle_spawn_max_x = CANVAS_WIDTH - 200.0f;
+    float m_obstacle_spawn_min_y = 200.0f;
+    float m_obstacle_spawn_max_y = CANVAS_HEIGHT - 200.0f;
 
-    std::vector<std::pair<float, float>> m_breakable_obstacle_spawn_positions_level4 = {
-        {200.0f, 600.0f},  // First breakable obstacle position
-        {600.0f, 200.0f}   // Second breakable obstacle position
-    };
-
-    // **Predefined Spawn Positions for Level 4 Powerups**
-    // Ensure these positions are spaced adequately from each other and from obstacles
-    std::vector<std::pair<float, float>> m_powerup_spawn_positions_level4 = {
-        {400.0f, 300.0f},
-        {400.0f, 500.0f},
-        {300.0f, 400.0f},
-        {500.0f, 400.0f}
-    };
+    float m_powerup_spawn_min_x = 200.0f;
+    float m_powerup_spawn_max_x = CANVAS_WIDTH - 200.0f;
+    float m_powerup_spawn_min_y = 200.0f;
+    float m_powerup_spawn_max_y = CANVAS_HEIGHT - 200.0f;
 
     // Maximum counts
     static const int MAX_UNBREAKABLE_OBSTACLES = 2;
@@ -159,6 +150,21 @@ public:
      * @return The current level number as an integer.
      */
     int getLevelNumber() const { return m_level_number; }
+
+    /**
+    * @brief Generates a random float between min and max.
+    * @param min The minimum value.
+    * @param max The maximum value.
+    * @return A random float within [min, max].
+    */
+    float getRandomFloat(float min, float max)
+    {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> dist(min, max);
+        return dist(gen);
+    }
+
 
     /**
      * @brief Destructor for the Level class.
