@@ -19,8 +19,8 @@ protected:
 
     float x;                     ///< Horizontal position of the object.
     float y;                     ///< Vertical position of the object.
-    float m_width;
-    float m_height;
+	float m_width;  	         ///< Width of the object.
+	float m_height;			     ///< Height of the object.
 
 public:
     /**

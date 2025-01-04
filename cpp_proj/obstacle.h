@@ -16,7 +16,7 @@ public:
     };
 
 private:
-    Type m_type;
+	Type m_type;         ///< Type of obstacle.
     int m_hit_points;    ///< For breakable obstacles.
     float m_speed;       ///< For unbreakable obstacles.
     int m_direction = 1; ///< 1 for down, -1 for up.
@@ -49,14 +49,38 @@ public:
      */
     void handleHit();
 
+	/**
+	* @brief Returns true if the obstacle is breakable.
+	*/
     bool isBreakable() const { return m_type == Type::Breakable; }
 
+	/**
+	* @brief Returns the hit points of the obstacle.
+	*/
     int getHitPoints() const { return m_hit_points; }
+
+	/**
+	* @brief Sets the hit points of the obstacle.
+	*/
     void setHitPoints(int hp) { m_hit_points = hp; }
 
+    /**
+	* @brief Returns the width of the obstacle.
+	*/
     float getWidth() const { return m_width; }
+
+	/**
+	* @brief Returns the height of the obstacle.
+	*/
     float getHeight() const { return m_height; }
 
+    /**
+	* @brief Returns the speed of the obstacle.
+	*/
     float getSpeed() const { return m_speed; }
+
+	/**
+	* @brief Returns the direction of the obstacle.
+	*/
     int getDirection() const { return m_direction; }
 };

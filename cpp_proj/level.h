@@ -15,7 +15,7 @@
 /**
  * @class Level
  * @brief Manages all objects and logic for a single level, including players, the ball,
- *        obstacles, powerups, and background drawing. Also handles level progression.
+ * obstacles, powerups, and background drawing. Also handles level progression.
  */
 class Level
 {
@@ -23,7 +23,7 @@ private:
     // Current level number (1-4)
     int m_level_number = 1;
 
-    // Timer for each level (1 minute = 60.0f seconds)
+    // Timer for each level (1 minute = 600.0f seconds)
     float m_level_timer = 300.0f;
 
     // Powerup spawning variables
@@ -108,7 +108,6 @@ private:
 
     LevelState m_level_state = LevelState::MAIN_MENU; ///< Current state within the level.
 
-
     /**
      * @brief Sets up the game objects specific to a given level (1-4).
      * @param level_number The level number to set up.
@@ -164,7 +163,6 @@ public:
         std::uniform_real_distribution<float> dist(min, max);
         return dist(gen);
     }
-
 
     /**
      * @brief Destructor for the Level class.

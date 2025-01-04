@@ -6,9 +6,6 @@
 #include "config.h"
 #include <iostream>
 
-// Global GameState instance (optional, since we use Singleton)
-std::unique_ptr<GameState> gameState;
-
 /**
  * @brief Draw callback function.
  * Calls the GameState's draw method.

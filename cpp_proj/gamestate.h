@@ -8,7 +8,7 @@
 /**
  * @class GameState
  * @brief Manages the overall state of the game, including levels and global settings.
- *        Implements the Singleton pattern to ensure a unique instance.
+ * Implements the Singleton pattern to ensure a unique instance.
  */
 class GameState
 {
@@ -21,7 +21,6 @@ private:
 
     // Unique pointer to the current Level and menu
     std::unique_ptr<Level> level;
-
 
     /**
      * @brief Private constructor to prevent external instantiation.
@@ -90,6 +89,15 @@ public:
      */
     void draw() const;
 
+	/**
+	* @brief Retrieves the width of the game canvas.
+	* @return The width of the canvas.
+	*/
 	float getCanvasWidth() const { return CANVAS_WIDTH; }
+
+	/**
+	* @brief Retrieves the height of the game canvas.
+	* @return The height of the canvas.
+	*/
 	float getCanvasHeight() const { return CANVAS_HEIGHT; }
 };

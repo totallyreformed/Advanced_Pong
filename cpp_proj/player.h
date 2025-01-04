@@ -10,12 +10,12 @@
 class Player : public GameObject
 {
 private:
-    float m_width;
-    float m_height;
-    float speed;
+	float m_width;         // Width of the player paddle.
+	float m_height;		   // Height of the player paddle.
+	float speed;		   // Speed of the player paddle.
 
-    graphics::scancode_t moveUpKey;
-    graphics::scancode_t moveDownKey;
+	graphics::scancode_t moveUpKey;      // Key to move the paddle up.
+	graphics::scancode_t moveDownKey;    // Key to move the paddle down.
 
 public:
     /**

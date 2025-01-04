@@ -17,8 +17,8 @@ public:
     };
 
 private:
-    Type m_type;
-    std::string m_texture_file;
+    Type m_type;                    // Type of the powerup
+    std::string m_texture_file;     // Asset for the powerup
 
 public:
     Powerup(GameState* gs, const std::string& name, Type type, float x, float y);
