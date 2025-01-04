@@ -20,8 +20,8 @@ Level::~Level()
 void Level::init(int level_number, bool show_menu)
 {
     // Set the current level number
-    m_level_number = level_number;
-    //m_level_number = 4;
+    //m_level_number = level_number;
+    m_level_number = 4;
     // debug sudden death
 
     // Initialize powerup spawning variables
@@ -56,7 +56,7 @@ void Level::init(int level_number, bool show_menu)
     }
 
     // Reset the level timer to 30 seconds
-    m_level_timer = 50.0f;
+    m_level_timer = 300.0f;
 
     // Clear existing obstacles and powerups
     m_obstacles.clear();
@@ -141,14 +141,14 @@ void Level::setupLevelObjects(int level_number)
         // Add Breakable Obstacles
         auto obstacle1 = std::make_unique<Obstacle>(
             GameState::getInstance(), "BreakableObstacle1", Obstacle::Type::Breakable,
-            450.0f, 800.0f, 10.0f, 100.0f, 2, 0.0f
+            450.0f, 700.0f, 10.0f, 100.0f, 2, 0.0f
         );
         obstacle1->init();
         m_obstacles.push_back(std::move(obstacle1));
 
         auto obstacle2 = std::make_unique<Obstacle>(
             GameState::getInstance(), "BreakableObstacle2", Obstacle::Type::Breakable,
-            450.0f, 300.0f, 10.0f, 100.0f, 2, 0.0f
+            450.0f, 250.0f, 10.0f, 100.0f, 2, 0.0f
         );
         obstacle2->init();
         m_obstacles.push_back(std::move(obstacle2));
@@ -161,14 +161,14 @@ void Level::setupLevelObjects(int level_number)
         // Add Breakable Obstacles
         auto obstacle1 = std::make_unique<Obstacle>(
             GameState::getInstance(), "BreakableObstacle3", Obstacle::Type::Breakable,
-            450.0f, 600.0f, 10.0f, 100.0f, 2, 0.0f
+            400.0f, 700.0f, 10.0f, 100.0f, 2, 0.0f
         );
         obstacle1->init();
         m_obstacles.push_back(std::move(obstacle1));
 
         auto obstacle2 = std::make_unique<Obstacle>(
             GameState::getInstance(), "BreakableObstacle4", Obstacle::Type::Breakable,
-            450.0f, 100.0f, 10.0f, 100.0f, 2, 0.0f
+            500.0f, 250.0f, 10.0f, 100.0f, 2, 0.0f
         );
         obstacle2->init();
         m_obstacles.push_back(std::move(obstacle2));
@@ -180,6 +180,13 @@ void Level::setupLevelObjects(int level_number)
         );
         obstacle3->init();
         m_obstacles.push_back(std::move(obstacle3));
+
+        auto obstacle4 = std::make_unique<Obstacle>(
+            GameState::getInstance(), "UnbreakableObstacle2", Obstacle::Type::Unbreakable,
+            550.0f, 700.0f, 10.0f, 100.0f, 0, 0.7f
+        );
+        obstacle4->init();
+        m_obstacles.push_back(std::move(obstacle4));
     }
     else if (level_number == 4)
     {
@@ -196,7 +203,7 @@ void Level::setupLevelObjects(int level_number)
         // Increase ball speed by 50%
         if (m_ball)
         {
-            m_ball->setSpeed(m_ball->getSpeed() * 1.5f); // Increase speed by 50%
+            m_ball->setSpeed(m_ball->getSpeed() * 1.4f); // Increase speed by 40%
             std::cout << "Ball speed increased for Sudden Death.\n";
         }
 
@@ -1069,7 +1076,7 @@ void Level::draw() const
             winner_text = "Game Over";
         }
 
-        graphics::drawText(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f - 25.0f, 50.0f, winner_text, br);
+        graphics::drawText(CANVAS_WIDTH / 2.0f - 140.0f, CANVAS_HEIGHT / 2.0f - 50.0f, 50.0f, winner_text, br);
 
         // Optionally, display final scores
         std::string final_score = "Final Scores - P1: " + std::to_string(m_player1_score) +
@@ -1079,7 +1086,7 @@ void Level::draw() const
         score_br.fill_color[1] = 1.0f;
         score_br.fill_color[2] = 1.0f;
         score_br.outline_opacity = 0.0f;
-        graphics::drawText(CANVAS_WIDTH / 2.0f, CANVAS_HEIGHT / 2.0f + 25.0f, 30.0f, final_score, score_br);
+        graphics::drawText(CANVAS_WIDTH / 2.0f - 148.0f, CANVAS_HEIGHT / 2.0f + 10.0f, 30.0f, final_score, score_br);
 
         break;
     }
