@@ -28,8 +28,8 @@ Level::~Level()
 void Level::init(int level_number, bool show_menu)
 {
     // Set the current level number
-    m_level_number = level_number;
-    //m_level_number = 4;
+    //m_level_number = level_number;
+    m_level_number = 4;
     // Debug: Sudden death mode initialization
 
     // Initialize powerup spawning variables
@@ -38,7 +38,7 @@ void Level::init(int level_number, bool show_menu)
     m_powerups_spawned = 0;
 
     // Initialize obstacle spawning variables (Sudden Death)
-	m_next_obstacle_spawn_time = 7.5f;
+	m_next_obstacle_spawn_time_level4 = 7.5f;
 
     // **Initialize speed multiplier**
     m_speed_multiplier = 1.0f;
@@ -86,7 +86,7 @@ void Level::init(int level_number, bool show_menu)
 
     // Initialize Sound Effects
     m_paddle_hit_sound = std::make_unique<Music>(GameState::getInstance(), "PaddleHit", "paddle_hit.wav", 0.6f, false, true);
-    m_powerup_sound = std::make_unique<Music>(GameState::getInstance(), "PowerupSound", "paddle_hit.wav", 0.6f, false, true);
+    m_powerup_sound = std::make_unique<Music>(GameState::getInstance(), "PowerupSound", "powerup.mp3", 0.6f, false, true);
 
     if (show_menu)
     {
@@ -165,8 +165,8 @@ void Level::setupLevelObjects(int level_number)
     }
     else if (level_number == 3)
     {
-        // Level 3: Add 2 stationary breakable obstacles, 1 moving unbreakable obstacle + 3 powerups
-        std::cout << "Level 3: Adding 2 breakable obstacles, 1 unbreakable moving obstacle, and 3 powerups.\n";
+        // Level 3: Add 2 stationary breakable obstacles, 2 moving unbreakable obstacle + 3 powerups
+        std::cout << "Level 3: Adding 2 breakable obstacles, 2 unbreakable moving obstacle, and 3 powerups.\n";
 
         // Add Breakable Obstacles
         auto obstacle1 = std::make_unique<Obstacle>(
@@ -512,6 +512,9 @@ void Level::update(float dt)
                 // **Reset speed multiplier to default**
                 m_speed_multiplier = 1.0f;
 
+                // Reset last player to hit the ball
+                m_last_player_to_hit = 0;
+
                 std::cout << "Powerups cleared and speed multiplier reset after Player1 scoring.\n";
             }
             // **Check for collision with left boundary (Player 2 scores)**
@@ -530,6 +533,9 @@ void Level::update(float dt)
 
                 // **Reset speed multiplier to default**
                 m_speed_multiplier = 1.0f;
+
+                // Reset last player to hit the ball
+                m_last_player_to_hit = 0;
 
                 std::cout << "Powerups cleared and speed multiplier reset after Player2 scoring.\n";
             }
@@ -592,6 +598,9 @@ void Level::update(float dt)
                             << m_ball->getSpeed_x() << ", speed_y = " << m_ball->getSpeed_y() << std::endl;
                     }
 
+                    // Set the last player to hit the ball
+                    m_last_player_to_hit = 1;
+
                     // **Optional: Play collision sound**
                     if (m_paddle_hit_sound)
                     {
@@ -628,6 +637,9 @@ void Level::update(float dt)
                         std::cout << "Ball velocity normalized after Player 2 paddle collision: speed_x = "
                             << m_ball->getSpeed_x() << ", speed_y = " << m_ball->getSpeed_y() << std::endl;
                     }
+
+                    // Set the last player to hit the ball
+                    m_last_player_to_hit = 2;
 
                     // **Optional: Play collision sound**
                     if (m_paddle_hit_sound)
@@ -701,19 +713,24 @@ void Level::update(float dt)
                             // **Handle Scoring When Breaking Breakable Obstacles**
                             if (obstacle->isBreakable() && obstacle->getHitPoints() == 0)
                             {
-                                if (m_ball->getX() < obstacle->getX())
+                                if (m_last_player_to_hit == 1)
                                 {
                                     // Player 1 broke the obstacle
                                     m_player1_score++;
                                     std::cout << "Player 1 broke obstacle '" << obstacle->getName()
                                         << "'. Score: " << m_player1_score << std::endl;
                                 }
-                                else
+                                else if (m_last_player_to_hit == 2)
                                 {
                                     // Player 2 broke the obstacle
                                     m_player2_score++;
                                     std::cout << "Player 2 broke obstacle '" << obstacle->getName()
                                         << "'. Score: " << m_player2_score << std::endl;
+                                }
+                                else
+                                {
+                                    // If no player has hit the ball yet, default to assigning score to both or skip
+                                    std::cout << "Obstacle '" << obstacle->getName() << "' broken with no player interaction.\n";
                                 }
                             }
 

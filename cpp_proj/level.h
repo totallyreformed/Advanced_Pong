@@ -31,7 +31,6 @@ private:
     float m_next_powerup_spawn_time;          // Time at which the next powerup should spawn
     int m_total_powerups_to_spawn;            // Total number of powerups to spawn in the level
     int m_powerups_spawned;                   // Number of powerups that have been spawned so far
-	int m_next_obstacle_spawn_time = 0.0f; 		 // Time at which the next obstacle should spawn
     int m_next_breakable_obstacle_spawn_time_level4; // Time at which the next obstacle should spawn in Level 4
 	float m_speed_multiplier; 			 // Speed multiplier to track active powerups affecting the ball's speed
 
@@ -51,8 +50,8 @@ private:
 
     // Maximum counts
     static const int MAX_UNBREAKABLE_OBSTACLES = 2;
-	static const int MAX_BREAKABLE_OBSTACLES = 2;
-    static const int MAX_POWERUPS = 4;
+	static const int MAX_BREAKABLE_OBSTACLES = 3;
+    static const int MAX_POWERUPS = 5;
 
     // Counters to track spawned obstacles and powerups in Level 4
     // **Counters to Track Spawned Obstacles in Level 4**
@@ -68,6 +67,9 @@ private:
     // Each player has its own score to determine who wins in the end
     int m_player1_score = 0;
     int m_player2_score = 0;
+
+    // Define which player destroyed the obstacle
+    int m_last_player_to_hit = 0; // 0: none, 1: Player1, 2: Player2
 
 	// Winner of the match (0 = no winner yet, 1 = player 1, 2 = player 2)
     int m_winner = 0;

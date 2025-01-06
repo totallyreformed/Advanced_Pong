@@ -117,10 +117,10 @@ void Menu::draw() const
 
         // Centered "Press SPACE to Continue"
         graphics::drawText(
-            CANVAS_WIDTH / 2.0f - 105.0f,   // Adjusted to center horizontally
+            CANVAS_WIDTH / 2.0f - 175.0f,   // Adjusted to center horizontally
             CANVAS_HEIGHT / 2.0f + 40.0f,   // Positioned below "Ready?"
             20.0f,                          // Font size for instructions
-            "Press SPACE to Continue",
+            "Press SPACE to Continue to the next Level",
             text_br
         );
     }
@@ -135,12 +135,12 @@ void Menu::draw() const
             text_br
         );
 
-        // **b. Draw "Press SPACE to Main Menu" Instruction**
+        // **b. Draw "Press R to return to the Main Menu" Instruction**
         graphics::drawText(
             CANVAS_WIDTH / 2.0f - 150.0f,    // Centered horizontally
             CANVAS_HEIGHT / 2.0f,             // Centered vertically
             30.0f,                            // Font size
-            "Press SPACE to Play Again",
+            "Press R to Play Again",
             text_br
         );
 
