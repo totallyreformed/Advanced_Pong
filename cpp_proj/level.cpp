@@ -651,7 +651,7 @@ void Level::update(float dt)
         }
 
         // **8. Collision Detection with Obstacles**
-        if (m_ball && m_ball->isActive())
+        if (m_ball && m_ball->isActive() && !m_ball->isRampingUp())
         {
             // Create a Box representing the ball's current position and size
             Box ballBox(m_ball->getX(), m_ball->getY(), m_ball->getWidth(), m_ball->getHeight());
