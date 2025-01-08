@@ -28,8 +28,8 @@ Level::~Level()
 void Level::init(int level_number, bool show_menu)
 {
     // Set the current level number
-    //m_level_number = level_number;
-    m_level_number = 4;
+    m_level_number = level_number;
+    //m_level_number = 4;
     // Debug: Sudden death mode initialization
 
     // Initialize powerup spawning variables
@@ -60,10 +60,14 @@ void Level::init(int level_number, bool show_menu)
         m_unbreakable_obstacles_spawned_level4 = 0;
         m_breakable_obstacles_spawned_level4 = 0;
         m_powerups_spawned_level4 = 0;
+
+        // Reset player score in sudden death (First to 10 wins)
+        m_player1_score = 0;
+        m_player2_score = 0;
     }
 
     // Reset the level timer to 30 seconds
-    m_level_timer = 30.0f;
+    m_level_timer = 150.0f;
 
     // Clear existing obstacles and powerups
     m_obstacles.clear();
