@@ -36,7 +36,7 @@ private:
 
     std::vector<std::pair<float, float>> m_powerup_spawn_positions; // Predefined spawn positions for powerups
 
-    // **Spawn Boundaries for Level 4 (Sudden Death)**
+    // Spawn Boundaries for Level 4 (Sudden Death)
     // Define minimum and maximum X and Y coordinates for spawning obstacles and powerups
     float m_obstacle_spawn_min_x = 200.0f;
     float m_obstacle_spawn_max_x = CANVAS_WIDTH - 200.0f;
@@ -54,7 +54,6 @@ private:
     static const int MAX_POWERUPS = 5;
 
     // Counters to track spawned obstacles and powerups in Level 4
-    // **Counters to Track Spawned Obstacles in Level 4**
     int m_obstacles_spawned_level4 = 0;
     int m_unbreakable_obstacles_spawned_level4 = 0;
     int m_breakable_obstacles_spawned_level4 = 0;
@@ -151,6 +150,24 @@ public:
      * @return The current level number as an integer.
      */
     int getLevelNumber() const { return m_level_number; }
+
+    /**
+    * @brief Retrieves the first player object.
+    * @return Pointer to the first Player.
+    */
+    Player* getPlayer1() const { return m_player1.get(); }
+
+    /**
+     * @brief Retrieves the second player object.
+     * @return Pointer to the second Player.
+     */
+    Player* getPlayer2() const { return m_player2.get(); }
+
+    /**
+     * @brief Retrieves the ball object.
+     * @return Pointer to the Ball.
+     */
+    Ball* getBall() const { return m_ball.get(); }
 
     /**
     * @brief Generates a random float between min and max.

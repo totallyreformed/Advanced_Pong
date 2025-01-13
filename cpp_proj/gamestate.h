@@ -70,8 +70,35 @@ public:
      */
     std::string getAssetDir();
 
-    // Get current level
+	/**
+	* @brief Retrieves the current level.
+	* @return Pointer to the current Level.
+	*/
 	Level* getCurrentLevel() const { return level.get(); }
+
+    /**
+    * @brief Retrieves the first player object from the current level.
+    * @return Pointer to Player1, or nullptr if no level is active.
+    */
+    Player* getPlayer1() const {
+        return level ? level->getPlayer1() : nullptr;
+    }
+
+    /**
+     * @brief Retrieves the second player object from the current level.
+     * @return Pointer to Player2, or nullptr if no level is active.
+     */
+    Player* getPlayer2() const {
+        return level ? level->getPlayer2() : nullptr;
+    }
+
+    /**
+     * @brief Retrieves the ball object from the current level.
+     * @return Pointer to the Ball, or nullptr if no level is active.
+     */
+    Ball* getBall() const {
+        return level ? level->getBall() : nullptr;
+    }
 
     /**
      * @brief Initializes the game state, including levels and sounds.

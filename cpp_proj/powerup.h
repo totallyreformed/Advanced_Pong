@@ -23,9 +23,21 @@ private:
 public:
     Powerup(GameState* gs, const std::string& name, Type type, float x, float y);
 
+    /*
+	* @brief Initializes the Powerup object.
+    */
     void init() override;
+
+	/*
+	* @brief Updates the Powerup object.
+    */
     void update(float dt) override;
+
+	/*
+	* @brief Draws the Powerup object.
+    */
     void draw() override;
 
+    // Powerup type getter
     Type getType() const { return m_type; }
 };

@@ -40,7 +40,7 @@ void Level::init(int level_number, bool show_menu)
     // Initialize obstacle spawning variables (Sudden Death)
 	m_next_obstacle_spawn_time_level4 = 7.5f;
 
-    // **Initialize speed multiplier**
+    // Initialize speed multiplier
     m_speed_multiplier = 1.0f;
 
     // Define powerup spawn positions based on level
@@ -94,7 +94,7 @@ void Level::init(int level_number, bool show_menu)
 
     if (show_menu)
     {
-        // **Determine Menu Type Based on Level Number**
+        // Determine Menu Type Based on Level Number
         MenuType current_menu_type = (level_number == 1) ? MenuType::MAIN_MENU : MenuType::PAUSE_MENU;
 
         // Initialize Menu with the determined type
@@ -190,14 +190,14 @@ void Level::setupLevelObjects(int level_number)
         // Add Unbreakable Moving Obstacle
         auto obstacle3 = std::make_unique<Obstacle>(
             GameState::getInstance(), "UnbreakableObstacle1", Obstacle::Type::Unbreakable,
-            350.0f, 300.0f, 10.0f, 100.0f, 0, 0.7f
+            350.0f, 300.0f, 10.0f, 100.0f, 0, 0.5f
         );
         obstacle3->init();
         m_obstacles.push_back(std::move(obstacle3));
 
         auto obstacle4 = std::make_unique<Obstacle>(
             GameState::getInstance(), "UnbreakableObstacle2", Obstacle::Type::Unbreakable,
-            550.0f, 700.0f, 10.0f, 100.0f, 0, 0.7f
+            550.0f, 700.0f, 10.0f, 100.0f, 0, 0.5f
         );
         obstacle4->init();
         m_obstacles.push_back(std::move(obstacle4));
@@ -222,6 +222,7 @@ void Level::setupLevelObjects(int level_number)
         }
 
         // Initialize spawning timers for obstacles and powerups
+        
         // Schedule first unbreakable obstacle spawn after 2 seconds
         m_next_obstacle_spawn_time_level4 = m_elapsed_time + 2.0f;
         // Schedule first breakable obstacle spawn after 4 seconds
@@ -265,7 +266,7 @@ void Level::update(float dt)
         break;
 
     case LevelState::ACTIVE:
-        // **1. Update Level Timer**
+        // 1. Update Level Timer
         if (m_level_number != 4) // Exclude Sudden Death from Level Timer countdown
         {
             m_level_timer -= dt / 100.0f;
@@ -275,10 +276,10 @@ void Level::update(float dt)
             }
         }
 
-        // **Update elapsed time**
+        // Update elapsed time
         m_elapsed_time += dt / 1000; // Assuming dt is in milliseconds; adjust if necessary
 
-        // **2. Powerup and Obstacle Spawning Logic for Levels 2 and 3**
+        // 2. Powerup and Obstacle Spawning Logic for Levels 2 and 3
         if (m_level_number == 2 || m_level_number == 3) {
             if (m_total_powerups_to_spawn > 0 && m_powerups_spawned < m_total_powerups_to_spawn)
             {
@@ -337,9 +338,9 @@ void Level::update(float dt)
             }
         }
 
-        // **3. Powerup and Obstacle Spawning Logic for Level 4**
+        // 3. Powerup and Obstacle Spawning Logic for Level 4
         if (m_level_number == 4) {
-            // **Sudden Death: Spawn Unbreakable Obstacles**
+            // Sudden Death: Spawn Unbreakable Obstacles
             if (m_unbreakable_obstacles_spawned_level4 < MAX_UNBREAKABLE_OBSTACLES &&
                 m_obstacles_spawned_level4 < MAX_UNBREAKABLE_OBSTACLES &&
                 m_elapsed_time >= m_next_obstacle_spawn_time_level4)
@@ -352,7 +353,7 @@ void Level::update(float dt)
                 auto obstacle = std::make_unique<Obstacle>(
                     GameState::getInstance(), "UnbreakableObstacle_SuddenDeath_" + std::to_string(m_unbreakable_obstacles_spawned_level4 + 1),
                     Obstacle::Type::Unbreakable,
-                    ox, oy, 10.0f, 100.0f, 0, 0.7f
+                    ox, oy, 10.0f, 100.0f, 0, 0.5f
                 );
                 obstacle->init();
                 m_obstacles.push_back(std::move(obstacle));
@@ -368,7 +369,7 @@ void Level::update(float dt)
                     << " at (" << ox << ", " << oy << ").\n";
             }
 
-            // **Sudden Death: Spawn Breakable Obstacles**
+            // Sudden Death: Spawn Breakable Obstacles
             if (m_breakable_obstacles_spawned_level4 < MAX_BREAKABLE_OBSTACLES &&
                 m_elapsed_time >= m_next_breakable_obstacle_spawn_time_level4)
             {
@@ -396,7 +397,7 @@ void Level::update(float dt)
                     << " at (" << bx << ", " << by << ").\n";
             }
 
-            // **Sudden Death: Spawn Powerups**
+            // Sudden Death: Spawn Powerups
             if (m_powerups_spawned_level4 < MAX_POWERUPS &&
                 m_elapsed_time >= m_next_powerup_spawn_time_level4)
             {
@@ -415,7 +416,7 @@ void Level::update(float dt)
                 default: type = Powerup::Type::SLOW_DOWN; break;
                 }
 
-                // **Optional: Check distance from existing powerups and obstacles before spawning**
+                // Optional: Check distance from existing powerups and obstacles before spawning
                 bool can_spawn = true;
                 const float MIN_DISTANCE = 100.0f; // Minimum distance between powerups and obstacles
 
@@ -474,7 +475,7 @@ void Level::update(float dt)
 
         
 
-        // **4. Update Players, Ball, Obstacles, and Powerups**
+        // 4. Update Players, Ball, Obstacles, and Powerups
         if (m_player1 && m_player1->isActive()) m_player1->update(dt);
         if (m_player2 && m_player2->isActive()) m_player2->update(dt);
         if (m_ball && m_ball->isActive()) m_ball->update(dt);
@@ -491,7 +492,7 @@ void Level::update(float dt)
                 powerup->update(dt);
         }
 
-        // **5. Boundary Collision Detection and Response for Scoring**
+        // 5. Boundary Collision Detection and Response for Scoring
         if (m_ball && m_ball->isActive())
         {
             float bx = m_ball->getX();
@@ -499,7 +500,7 @@ void Level::update(float dt)
             float halfW = m_ball->getWidth() / 2.0f;
             float halfH = m_ball->getHeight() / 2.0f;
 
-            // **Check for collision with right boundary (Player 1 scores)**
+            // Check for collision with right boundary (Player 1 scores)
             if (bx + halfW >= CANVAS_WIDTH)
             {
                 // Increment Player1's score
@@ -507,13 +508,13 @@ void Level::update(float dt)
                 std::cout << "Scores - Player1: " << m_player1_score << ", Player2: " << m_player2_score << std::endl;
                 m_ball->reset();
 
-                // **Clear active powerups on the ball**
+                // Clear active powerups on the ball
                 if (m_ball)
                 {
                     m_ball->clearActivePowerups();
                 }
 
-                // **Reset speed multiplier to default**
+                // Reset speed multiplier to default
                 m_speed_multiplier = 1.0f;
 
                 // Reset last player to hit the ball
@@ -521,7 +522,7 @@ void Level::update(float dt)
 
                 std::cout << "Powerups cleared and speed multiplier reset after Player1 scoring.\n";
             }
-            // **Check for collision with left boundary (Player 2 scores)**
+            // Check for collision with left boundary (Player 2 scores)
             else if (bx - halfW <= 0.0f)
             {
                 // Increment Player2's score
@@ -529,13 +530,13 @@ void Level::update(float dt)
                 std::cout << "Scores - Player1: " << m_player1_score << ", Player2: " << m_player2_score << std::endl;
                 m_ball->reset();
 
-                // **Clear active powerups on the ball**
+                // Clear active powerups on the ball
                 if (m_ball)
                 {
                     m_ball->clearActivePowerups(); // Ensure this method exists in the Ball class
                 }
 
-                // **Reset speed multiplier to default**
+                // Reset speed multiplier to default
                 m_speed_multiplier = 1.0f;
 
                 // Reset last player to hit the ball
@@ -544,9 +545,9 @@ void Level::update(float dt)
                 std::cout << "Powerups cleared and speed multiplier reset after Player2 scoring.\n";
             }
 
-            // **6. Boundary Collision Detection and Response for Walls**
+            // 6. Boundary Collision Detection and Response for Walls
 
-            // **Check for collision with top boundary**
+            // Check for collision with top boundary
             if (by + halfH >= CANVAS_HEIGHT)
             {
                 m_ball->setY(CANVAS_HEIGHT - halfH);
@@ -554,7 +555,7 @@ void Level::update(float dt)
                 std::cout << "Ball collided with top boundary. New speed_y: " << m_ball->getSpeed_y() << std::endl;
             }
 
-            // **Check for collision with bottom boundary**
+            // Check for collision with bottom boundary
             else if (by - halfH <= 0.0f)
             {
                 m_ball->setY(halfH);
@@ -563,7 +564,7 @@ void Level::update(float dt)
             }
         }
 
-        // **7. Collision Detection with Player Paddles**
+        // 7. Collision Detection with Player Paddles
         if (m_ball && m_ball->isActive())
         {
             if (!m_ball->isActivePowerup()) {
@@ -573,7 +574,7 @@ void Level::update(float dt)
             // Create a Box representing the ball's current position and size
             Box ballBox(m_ball->getX(), m_ball->getY(), m_ball->getWidth(), m_ball->getHeight());
 
-            // **Collision with Player 1 Paddle (Left Paddle)**
+            // Collision with Player 1 Paddle (Left Paddle)
             if (m_player1 && m_player1->isActive())
             {
                 Box paddle1Box(m_player1->getX(), m_player1->getY(), m_player1->getWidth(), m_player1->getHeight());
@@ -590,7 +591,7 @@ void Level::update(float dt)
 
                     std::cout << "Ball speed_y adjusted by Player 1 paddle movement: New speed_y = " << m_ball->getSpeed_y() << std::endl;
 
-                    // **Normalize the Ball's Velocity to Maintain Current Speed with Powerup**
+                    // Normalize the Ball's Velocity to Maintain Current Speed with Powerup
                     float current_speed = std::sqrt(m_ball->getSpeed_x() * m_ball->getSpeed_x() +
                         m_ball->getSpeed_y() * m_ball->getSpeed_y());
                     if (current_speed > 0.0f)
@@ -605,7 +606,7 @@ void Level::update(float dt)
                     // Set the last player to hit the ball
                     m_last_player_to_hit = 1;
 
-                    // **Optional: Play collision sound**
+                    // Play collision sound
                     if (m_paddle_hit_sound)
                     {
                         m_paddle_hit_sound->play();
@@ -613,7 +614,7 @@ void Level::update(float dt)
                 }
             }
 
-            // **Collision with Player 2 Paddle (Right Paddle)**
+            // Collision with Player 2 Paddle (Right Paddle)
             if (m_player2 && m_player2->isActive())
             {
                 Box paddle2Box(m_player2->getX(), m_player2->getY(), m_player2->getWidth(), m_player2->getHeight());
@@ -630,7 +631,7 @@ void Level::update(float dt)
 
                     std::cout << "Ball speed_y adjusted by Player 2 paddle movement: New speed_y = " << m_ball->getSpeed_y() << std::endl;
 
-                    // **Normalize the Ball's Velocity to Maintain Current Speed with Powerup**
+                    // Normalize the Ball's Velocity to Maintain Current Speed with Powerup
                     float current_speed = std::sqrt(m_ball->getSpeed_x() * m_ball->getSpeed_x() +
                         m_ball->getSpeed_y() * m_ball->getSpeed_y());
                     if (current_speed > 0.0f)
@@ -645,7 +646,7 @@ void Level::update(float dt)
                     // Set the last player to hit the ball
                     m_last_player_to_hit = 2;
 
-                    // **Optional: Play collision sound**
+                    // Play collision sound
                     if (m_paddle_hit_sound)
                     {
                         m_paddle_hit_sound->play();
@@ -654,7 +655,7 @@ void Level::update(float dt)
             }
         }
 
-        // **8. Collision Detection with Obstacles**
+        // 8. Collision Detection with Obstacles
         if (m_ball && m_ball->isActive() && !m_ball->isRampingUp())
         {
             // Create a Box representing the ball's current position and size
@@ -693,13 +694,13 @@ void Level::update(float dt)
                             std::cout << "Ball collided with breakable obstacle '" << obstacle->getName()
                                 << "'. New speed_x: " << m_ball->getSpeed_x() << std::endl;
 
-                            // **Adjust Ball's Vertical Speed Based on Obstacle's Movement**
+                            // Adjust Ball's Vertical Speed Based on Obstacle's Movement
                             m_ball->setSpeed_y(m_ball->getSpeed_y() + obstacle->getSpeed() * obstacle->getDirection());
 
                             std::cout << "Ball speed_y adjusted by obstacle movement: New speed_y = "
                                 << m_ball->getSpeed_y() << std::endl;
 
-                            // **Normalize the Ball's Velocity to Maintain Current Speed with Speed Multiplier**
+                            // Normalize the Ball's Velocity to Maintain Current Speed with Speed Multiplier
                             float current_speed = std::sqrt(m_ball->getSpeed_x() * m_ball->getSpeed_x() +
                                 m_ball->getSpeed_y() * m_ball->getSpeed_y());
                             if (current_speed > 0.0f)
@@ -714,7 +715,7 @@ void Level::update(float dt)
                             // Handle the hit on the obstacle
                             obstacle->handleHit();
 
-                            // **Handle Scoring When Breaking Breakable Obstacles**
+                            // Handle Scoring When Breaking Breakable Obstacles
                             if (obstacle->isBreakable() && obstacle->getHitPoints() == 0)
                             {
                                 if (m_last_player_to_hit == 1)
@@ -769,15 +770,13 @@ void Level::update(float dt)
                                     << "'. New speed_y: " << m_ball->getSpeed_y() << std::endl;
                             }
 
-                            // **Adjust Ball's Horizontal Speed Based on Obstacle's Movement (if necessary)**
-                            // If the obstacle is moving horizontally, you might want to adjust speed_x as well
-                            // Example:
+                            // Adjust Ball's Horizontal Speed Based on Obstacle's Movement (if necessary)
                             m_ball->setSpeed_x(m_ball->getSpeed_x() + obstacle->getSpeed() * obstacle->getDirection());
 
                             std::cout << "Ball speed_x adjusted by obstacle movement: New speed_x = "
                                 << m_ball->getSpeed_x() << std::endl;
 
-                            // **Normalize the Ball's Velocity to Maintain Current Speed with Speed Multiplier**
+                            // Normalize the Ball's Velocity to Maintain Current Speed with Speed Multiplier
                             float current_speed = std::sqrt(m_ball->getSpeed_x() * m_ball->getSpeed_x() +
                                 m_ball->getSpeed_y() * m_ball->getSpeed_y());
                             if (current_speed > 0.0f)
@@ -803,7 +802,7 @@ void Level::update(float dt)
             }
         }
 
-        // **9. Collision Detection with Powerups**
+        // 9. Collision Detection with Powerups
         if (m_ball && m_ball->isActive() && !m_ball->isRampingUp() && !m_ball->isActivePowerup())
         {
             // Create a Box representing the ball's current position and size
@@ -819,18 +818,17 @@ void Level::update(float dt)
                     {
                         m_ball->applyPowerup(powerup->getType());
 
-                        // **Adjust the speed multiplier based on the powerup type**
+                        // Adjust the speed multiplier based on the powerup type
                         if (powerup->getType() == Powerup::Type::SPEED_UP)
                         {
-                            m_speed_multiplier *= 1.5f; // Increase speed by 20%
+                            m_speed_multiplier *= 1.5f;
                             std::cout << "Speed Up Powerup Activated. Speed Multiplier: " << m_speed_multiplier << std::endl;
                         }
                         else if (powerup->getType() == Powerup::Type::SLOW_DOWN)
                         {
-                            m_speed_multiplier *= 0.6f; // Decrease speed by 20%
+                            m_speed_multiplier *= 0.6f;
                             std::cout << "Slow Down Powerup Activated. Speed Multiplier: " << m_speed_multiplier << std::endl;
                         }
-                        // Add additional powerup types and their effects as needed
 
                         // Play the powerup activation sound
                         if (m_powerup_sound)
@@ -848,10 +846,10 @@ void Level::update(float dt)
             }
         }
 
-        // **10. Check if it's time to progress to the next level**
+        // 10. Check if it's time to progress to the next level
         checkLevelProgression();
 
-        // **Handle Sudden Death Winning Conditions**
+        // Handle Sudden Death Winning Conditions
         if (m_level_number == 4 && m_level_state == LevelState::ACTIVE)
         {
             if (m_player1_score >= 10)
@@ -887,7 +885,6 @@ void Level::update(float dt)
                 {
                     m_level_state = LevelState::GAME_OVER;
                     std::cout << "All levels completed. Game Over.\n";
-                    // Optionally, implement Game Over logic here
                 }
                 m_menu->resetFlags();
             }
@@ -904,35 +901,35 @@ void Level::update(float dt)
 
         case LevelState::GAME_OVER:
         {
-            // **Initialize Game Over Menu if Not Already Initialized**
+            // Initialize Game Over Menu if Not Already Initialized
             if (!m_menu || m_menu->getMenuType() != MenuType::GAME_OVER_MENU)
             {
                 m_menu = std::make_unique<Menu>(MenuType::GAME_OVER_MENU);
                 std::cout << "Game Over Menu initialized.\n";
             }
 
-            // **Update the Game Over Menu**
+            // Update the Game Over Menu
             m_menu->update();
 
-            // **Handle Input: Press SPACE to Return to Main Menu**
+            // Handle Input: Press SPACE to Return to Main Menu
             if (m_menu->isPlayClicked())
             {
-                // **Reset Player Scores and Winner**
+                // Reset Player Scores and Winner
                 m_player1_score = 0;
                 m_player2_score = 0;
                 m_winner = 0;
 
-                // **Initialize Main Menu**
+                // Initialize Main Menu
                 init(1, true); // Reset to Level 1 with Main Menu
                 m_level_state = LevelState::MAIN_MENU;
                 std::cout << "Returning to Main Menu.\n";
             }
 
-            // **Handle Input: Press E to Exit Game**
+            // Handle Input: Press E to Exit Game
             if (m_menu->isExitClicked())
             {
                 std::cout << "Exit pressed. Closing game.\n";
-                graphics::destroyWindow(); // Ensure this correctly closes the game window
+                graphics::destroyWindow();
                 exit(0); // Terminate the program
             }
 
@@ -1046,7 +1043,7 @@ void Level::draw() const
     }
 
     case LevelState::GAME_OVER: {
-        // **a. Draw the Background Rectangle Covering the Entire Canvas**
+        // 1. Draw the Background Rectangle Covering the Entire Canvas
         graphics::drawRect(
             CANVAS_WIDTH / 2.0f,    // X position (centered horizontally)
             CANVAS_HEIGHT / 2.0f,   // Y position (centered vertically)
@@ -1055,12 +1052,12 @@ void Level::draw() const
             m_bg_brush               // Brush with texture and opacity
         );
 
-        // **b. Draw Game Over Screen with Winner Information**
+        // 2. Draw Game Over Screen with Winner Information
         graphics::Brush br;
         br.outline_opacity = 0.0f; // No outline
 
         std::string winner_text;
-        std::string sudden_death_text; // New string for Sudden Death indication
+        std::string sudden_death_text;
 
         if (m_winner == 1)
         {
@@ -1069,7 +1066,7 @@ void Level::draw() const
             br.fill_color[2] = 1.0f;
             winner_text = "Player 1 Wins!";
 
-            // **Check if the win was through Sudden Death**
+            // Check if the win was through Sudden Death
             if (m_level_number == 4)
             {
                 sudden_death_text = "(In Sudden Death)";
@@ -1082,7 +1079,7 @@ void Level::draw() const
             br.fill_color[2] = 0.0f;
             winner_text = "Player 2 Wins!";
 
-            // **Check if the win was through Sudden Death**
+            // Check if the win was through Sudden Death
             if (m_level_number == 4)
             {
                 sudden_death_text = "(In Sudden Death)";
@@ -1097,7 +1094,7 @@ void Level::draw() const
             // No Sudden Death text needed
         }
 
-        // **Draw the Winner Text at the Center of the Screen**
+        // Draw the Winner Text at the Center of the Screen
         graphics::drawText(
             CANVAS_WIDTH / 2.0f - 140.0f, // X position (adjusted for centering)
             CANVAS_HEIGHT / 2.0f - 50.0f, // Y position (placed higher on the screen)
@@ -1106,7 +1103,7 @@ void Level::draw() const
             br                             // Brush settings for the text
         );
 
-        // **c. Draw "In Sudden Death!" Text if Applicable**
+        // 3. Draw "In Sudden Death!" Text
         if (!sudden_death_text.empty())
         {
             graphics::drawText(
@@ -1118,7 +1115,7 @@ void Level::draw() const
             );
         }
 
-        // **d. Display Final Scores Below the Winner Text**
+        // 4. Display Final Scores Below the Winner Text
         std::string final_score = "Final Scores - P1: " + std::to_string(m_player1_score) +
             " | P2: " + std::to_string(m_player2_score);
         graphics::Brush score_br;
@@ -1134,7 +1131,7 @@ void Level::draw() const
             score_br                       // Brush settings for the text
         );
 
-        // **e. Add Replay Instruction Below Final Scores**
+        // 5. Add Replay Instruction Below Final Scores
         std::string replay_info = "Press R to Replay the Game";
         graphics::Brush replay_br;
         replay_br.fill_color[0] = 1.0f; // White color
@@ -1214,12 +1211,12 @@ void Level::nextLevel()
     }
     else
     {
-        // **After Level 4: Reset the game by displaying the Main Menu**
+        // After Level 4: Reset the game by displaying the Main Menu
 
-        // **Reset the level number to 1 to prepare for a new game**
+        // Reset the level number to 1 to prepare for a new game
         m_level_number = 1;
 
-        // **Initialize Level 1 with the Main Menu**
+        // Initialize Level 1 with the Main Menu
         init(m_level_number, true); // Show Main Menu for Level 1
 
         std::cout << "Sudden Death completed. Returning to Main Menu.\n";

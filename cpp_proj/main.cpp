@@ -51,7 +51,6 @@ int main()
 
     // Cleanup (optional, depending on implementation)
     // Currently, the Singleton instance is not deleted automatically
-    // Consider implementing a cleanup method if necessary
     GameState::getInstance()->releaseInstance();
 
     graphics::destroyWindow();
