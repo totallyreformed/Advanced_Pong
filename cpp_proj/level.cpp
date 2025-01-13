@@ -27,6 +27,9 @@ Level::~Level()
  */
 void Level::init(int level_number, bool show_menu)
 {
+    // Stop any currently playing music before reinitializing
+    if (m_background_music) { m_background_music->stop(); }
+
     // Set the current level number
     m_level_number = level_number;
     //m_level_number = 4;
@@ -67,7 +70,7 @@ void Level::init(int level_number, bool show_menu)
     }
 
     // Reset the level timer to 30 seconds
-    m_level_timer = 150.0f;
+    m_level_timer = 300.0f;
 
     // Clear existing obstacles and powerups
     m_obstacles.clear();
@@ -81,11 +84,58 @@ void Level::init(int level_number, bool show_menu)
     m_bg_brush.fill_opacity = 0.17f;
     m_bg_brush.outline_opacity = 0.0f;
 
-    // Initialize and Play Background Music
-    m_background_music = std::make_unique<Music>(GameState::getInstance(), "BackgroundMusic", "background_music.mp3", 1.0f, true, false);
-    if (m_background_music)
+    // If show_menu is true, play the menu music.
+    if (show_menu)
     {
-        m_background_music->play();
+        if (m_level_number == 1)
+        {
+            m_level_state = LevelState::MAIN_MENU;
+            m_background_music = std::make_unique<Music>(
+                GameState::getInstance(), "MainMenuMusic", "title_screen.mp3", 0.7f, true, false);
+        }
+        else
+        {
+            m_level_state = LevelState::PAUSE_MENU;
+            m_background_music = std::make_unique<Music>(
+                GameState::getInstance(), "PauseMenuMusic", "ready_screen.mp3", 0.7f, true, false);
+        }
+        if (m_background_music)
+        {
+            m_background_music->play();
+        }
+    }
+    else
+    {
+        // When show_menu is false, we are entering active gameplay.
+        m_level_state = LevelState::ACTIVE;
+        if (m_background_music)
+        {
+            m_background_music->stop();
+        }
+        if (m_level_number == 1)
+        {
+            m_background_music = std::make_unique<Music>(
+                GameState::getInstance(), "Level1Music", "level_1.mp3", 0.7f, true, false);
+        }
+        else if (m_level_number == 2)
+        {
+            m_background_music = std::make_unique<Music>(
+                GameState::getInstance(), "Level2Music", "level_2.mp3", 0.7f, true, false);
+        }
+        else if (m_level_number == 3)
+        {
+            m_background_music = std::make_unique<Music>(
+                GameState::getInstance(), "Level3Music", "level_3.mp3", 0.7f, true, false);
+        }
+        else
+        {
+            m_background_music = std::make_unique<Music>(
+                GameState::getInstance(), "SuddenDeathMusic", "level_4.mp3", 0.7f, true, false);
+        }
+        if (m_background_music)
+        {
+            m_background_music->play();
+        }
     }
 
     // Initialize Sound Effects
@@ -94,7 +144,7 @@ void Level::init(int level_number, bool show_menu)
 
     if (show_menu)
     {
-        // Determine Menu Type Based on Level Number
+        // Determine the menu type: Level 1 uses MAIN_MENU; other levels use PAUSE_MENU.
         MenuType current_menu_type = (level_number == 1) ? MenuType::MAIN_MENU : MenuType::PAUSE_MENU;
 
         // Initialize Menu with the determined type
@@ -251,8 +301,19 @@ void Level::update(float dt)
 		m_menu->update();
 
         if (m_menu->isPlayClicked()) {
+            // Stop the main menu music before transitioning
+			if (m_background_music) { m_background_music->stop(); }
+
             // Start level if play is clicked
             m_level_state = LevelState::ACTIVE;
+
+            // Initialize and play level-specific music
+            if (m_level_number == 1)
+                m_background_music = std::make_unique<Music>(
+                    GameState::getInstance(), "Level1Music", "level_1.mp3", 0.7f, true, false);
+
+            if (m_background_music) { m_background_music->play(); }
+
 			std::cout << "Starting Level " << m_level_number << ".\n";
         }
 
@@ -750,33 +811,32 @@ void Level::update(float dt)
                         }
                         else
                         {
-                            // Collision Logic for Unbreakable Obstacles
-
-                            // Determine the side of collision based on vertical position
-                            if (m_ball->getY() < obstacle->getY())
+                            // Use horizontal collision logic (as in the breakable branch) for unbreakable obstacles.
+                            if (m_ball->getX() < obstacle->getX())
                             {
-                                // Ball is above the obstacle
-                                m_ball->setSpeed_y(-fabs(m_ball->getSpeed_y())); // Ensure speed_y is negative
-                                m_ball->setY(obstacleBox.m_pos_y - obstacleBox.m_height / 2.0f - m_ball->getHeight() / 2.0f - 1.0f); // Prevent sticking
+                                // Ball is to the left of the obstacle
+                                m_ball->setSpeed_x(-fabs(m_ball->getSpeed_x())); // Ensure negative speed_x
+                                m_ball->setX(obstacleBox.m_pos_x - obstacleBox.m_width / 2.0f - m_ball->getWidth() / 2.0f - 1.0f); // Prevent sticking
                                 std::cout << "Ball collided with unbreakable obstacle '" << obstacle->getName()
-                                    << "'. New speed_y: " << m_ball->getSpeed_y() << std::endl;
+                                    << "'. New speed_x: " << m_ball->getSpeed_x() << std::endl;
                             }
                             else
                             {
-                                // Ball is below the obstacle
-                                m_ball->setSpeed_y(fabs(m_ball->getSpeed_y())); // Ensure speed_y is positive
-                                m_ball->setY(obstacleBox.m_pos_y + obstacleBox.m_height / 2.0f + m_ball->getHeight() / 2.0f + 1.0f); // Prevent sticking
+                                // Ball is to the right of the obstacle
+                                m_ball->setSpeed_x(fabs(m_ball->getSpeed_x())); // Ensure positive speed_x
+                                m_ball->setX(obstacleBox.m_pos_x + obstacleBox.m_width / 2.0f + m_ball->getWidth() / 2.0f + 1.0f); // Prevent sticking
                                 std::cout << "Ball collided with unbreakable obstacle '" << obstacle->getName()
-                                    << "'. New speed_y: " << m_ball->getSpeed_y() << std::endl;
+                                    << "'. New speed_x: " << m_ball->getSpeed_x() << std::endl;
                             }
 
-                            // Adjust Ball's Horizontal Speed Based on Obstacle's Movement (if necessary)
-                            m_ball->setSpeed_x(m_ball->getSpeed_x() + obstacle->getSpeed() * obstacle->getDirection());
+                            std::cout << "Ball collided with unbreakable obstacle '" << obstacle->getName() << "'.\n";
 
-                            std::cout << "Ball speed_x adjusted by obstacle movement: New speed_x = "
-                                << m_ball->getSpeed_x() << std::endl;
+                            // Adjust Ball's Vertical Speed Based on Obstacle's Movement
+                            m_ball->setSpeed_y(m_ball->getSpeed_y() + obstacle->getSpeed() * obstacle->getDirection());
+                            std::cout << "Ball speed_y adjusted by obstacle movement: New speed_y = "
+                                << m_ball->getSpeed_y() << std::endl;
 
-                            // Normalize the Ball's Velocity to Maintain Current Speed with Speed Multiplier
+                            // Normalize the Ball's Velocity to maintain current speed with speed multiplier
                             float current_speed = std::sqrt(m_ball->getSpeed_x() * m_ball->getSpeed_x() +
                                 m_ball->getSpeed_y() * m_ball->getSpeed_y());
                             if (current_speed > 0.0f)
@@ -784,7 +844,7 @@ void Level::update(float dt)
                                 float new_speed = m_ball->getSpeed() * m_speed_multiplier;
                                 m_ball->setSpeed_x((m_ball->getSpeed_x() / current_speed) * new_speed);
                                 m_ball->setSpeed_y((m_ball->getSpeed_y() / current_speed) * new_speed);
-                                std::cout << "Ball velocity normalized with speed multiplier after unbreakable obstacle collision: speed_x = "
+                                std::cout << "Ball velocity normalized after unbreakable obstacle collision: speed_x = "
                                     << m_ball->getSpeed_x() << ", speed_y = " << m_ball->getSpeed_y() << std::endl;
                             }
 
@@ -794,7 +854,7 @@ void Level::update(float dt)
                                 m_paddle_hit_sound->play();
                             }
 
-                            // Since the ball has collided with an unbreakable obstacle, no need to check other obstacles for this frame
+                            // Since the ball has collided with an obstacle, exit the loop for this frame
                             break;
                         }
                     }
@@ -857,6 +917,22 @@ void Level::update(float dt)
                 // Player 1 wins Sudden Death
                 m_winner = 1;
                 m_level_state = LevelState::GAME_OVER;
+
+                if (m_background_music) {
+                    m_background_music->stop();
+                }
+                m_background_music = std::make_unique<Music>(
+                    GameState::getInstance(),
+                    "GameOverMusic",
+                    "game_over.mp3",
+                    0.7f,
+                    false,
+                    false
+                );
+                if (m_background_music) {
+                    m_background_music->play();
+                }
+
                 std::cout << "Player 1 wins Sudden Death with score " << m_player1_score << "!\n";
             }
             else if (m_player2_score >= 10)
@@ -864,6 +940,22 @@ void Level::update(float dt)
                 // Player 2 wins Sudden Death
                 m_winner = 2;
                 m_level_state = LevelState::GAME_OVER;
+
+                if (m_background_music) {
+                    m_background_music->stop();
+                }
+                m_background_music = std::make_unique<Music>(
+                    GameState::getInstance(),
+                    "GameOverMusic",
+                    "game_over.mp3",
+                    0.7f,
+                    false,
+                    false
+                );
+                if (m_background_music) {
+                    m_background_music->play();
+                }
+
                 std::cout << "Player 2 wins Sudden Death with score " << m_player2_score << "!\n";
             }
         }
@@ -1190,6 +1282,18 @@ void Level::nextLevel()
             // Player 1 wins the game
             m_winner = 1;
             m_level_state = LevelState::GAME_OVER;
+
+            // Stop any currently playing music and switch to the game over soundtrack immediately
+            if (m_background_music)
+            {
+                m_background_music->stop();
+            }
+            m_background_music = std::make_unique<Music>(GameState::getInstance(), "GameOverMusic", "game_over.mp3", 0.7f, false, false);
+            if (m_background_music)
+            {
+                m_background_music->play();
+            }
+
             std::cout << "Player 1 wins with score " << m_player1_score
                 << " to " << m_player2_score << ".\n";
         }
@@ -1198,6 +1302,18 @@ void Level::nextLevel()
             // Player 2 wins the game
             m_winner = 2;
             m_level_state = LevelState::GAME_OVER;
+
+            // Stop any currently playing music and switch to the game over soundtrack immediately
+            if (m_background_music)
+            {
+                m_background_music->stop();
+            }
+            m_background_music = std::make_unique<Music>(GameState::getInstance(), "GameOverMusic", "game_over.mp3", 0.7f, false, false);
+            if (m_background_music)
+            {
+                m_background_music->play();
+            }
+
             std::cout << "Player 2 wins with score " << m_player2_score
                 << " to " << m_player1_score << ".\n";
         }

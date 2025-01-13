@@ -38,10 +38,10 @@ private:
 
     // Spawn Boundaries for Level 4 (Sudden Death)
     // Define minimum and maximum X and Y coordinates for spawning obstacles and powerups
-    float m_obstacle_spawn_min_x = 200.0f;
-    float m_obstacle_spawn_max_x = CANVAS_WIDTH - 200.0f;
+    float m_obstacle_spawn_min_x = 250.0f;
+    float m_obstacle_spawn_max_x = CANVAS_WIDTH - 250.0f;
     float m_obstacle_spawn_min_y = 200.0f;
-    float m_obstacle_spawn_max_y = CANVAS_HEIGHT - 200.0f;
+    float m_obstacle_spawn_max_y = CANVAS_HEIGHT - 250.0f;
 
     float m_powerup_spawn_min_x = 200.0f;
     float m_powerup_spawn_max_x = CANVAS_WIDTH - 200.0f;
